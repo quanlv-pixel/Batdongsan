@@ -1,0 +1,266 @@
+// ============================================================
+// Batdongsan — Prisma Schema
+// Version: 0.1 | Database: PostgreSQL
+// ============================================================
+
+
+generator client {
+  provider     = "prisma-client"
+  output       = "../../backend/src/generated/prisma"
+  moduleFormat = "esm"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+
+
+// ─────────────────────────────────────────────────────────────
+// Enums
+// ─────────────────────────────────────────────────────────────
+
+/// Backend-managed authorization roles (assigned by Admin, not self-selected)
+enum Role {
+  BUYER   // authenticated user; default upon registration
+  OWNER   // granted by Admin after verification
+  AGENT   // granted by Admin
+  ADMIN
+}
+
+enum ListingStatus {
+  DRAFT     // saved locally, not yet submitted
+  PENDING   // submitted; awaiting moderation
+  APPROVED  // publicly visible (BR-01)
+  REJECTED  // moderation refused
+  ARCHIVED  // taken offline by owner or admin
+}
+
+enum PropertyType {
+  APARTMENT
+  HOUSE
+  LAND
+  VILLA
+  COMMERCIAL
+  OTHER
+}
+
+enum TransactionType {
+  FOR_SALE
+  FOR_RENT
+}
+
+enum ContactRequestStatus {
+  NEW
+  IN_PROGRESS
+  COMPLETED
+  REJECTED
+}
+
+enum MlsSharePermission {
+  VIEW
+  MANAGE
+}
+
+// ─────────────────────────────────────────────────────────────
+// User
+// ─────────────────────────────────────────────────────────────
+
+model User {
+  id           String   @id @default(cuid())
+  email        String   @unique
+  passwordHash String
+  fullName     String
+  phone        String?
+  avatarUrl    String?
+  /// Backend-assigned role — never set directly from registration form (BR-02)
+  role         Role     @default(BUYER)
+  isActive     Boolean  @default(true)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  ownedListings       Listing[]           @relation("ListingOwner")
+  moderationActions   ModerationLog[]     @relation("ModeratorActions")
+  mlsSharesGranted    MlsShare[]          @relation("MlsGrantedBy")
+  mlsSharesReceived   MlsShare[]          @relation("MlsReceivedBy")
+  savedListings       SavedListing[]
+  contactRequests     ContactRequest[]    @relation("RequestBuyer")
+  assignedRequests    RequestAssignment[] @relation("AssignedAgent")
+  auditLogs           AuditLog[]
+
+  @@map("users")
+}
+
+// ─────────────────────────────────────────────────────────────
+// Listing (tin đăng)
+// ─────────────────────────────────────────────────────────────
+
+model Listing {
+  id              String          @id @default(cuid())
+  title           String
+  description     String          @db.Text
+  propertyType    PropertyType
+  transactionType TransactionType
+  priceVnd        BigInt
+  areaSqm         Float
+
+  // Public address components (safe to expose)
+  province String
+  district String
+  ward     String?
+
+  // Private address — never returned in public API responses (BR-03, NFR-02)
+  streetAddress String?
+  latitude      Float?
+  longitude     Float?
+
+  status    ListingStatus @default(DRAFT)
+  ownerId   String
+  owner     User          @relation("ListingOwner", fields: [ownerId], references: [id])
+  createdAt DateTime      @default(now())
+  updatedAt DateTime      @updatedAt
+
+  images          ListingImage[]
+  moderationLogs  ModerationLog[]
+  mlsShares       MlsShare[]
+  savedBy         SavedListing[]
+  contactRequests ContactRequest[]
+
+  @@index([status])
+  @@index([province, district])
+  @@index([propertyType, transactionType])
+  @@map("listings")
+}
+
+model ListingImage {
+  id        String   @id @default(cuid())
+  listingId String
+  listing   Listing  @relation(fields: [listingId], references: [id], onDelete: Cascade)
+  url       String
+  order     Int      @default(0)
+  createdAt DateTime @default(now())
+
+  @@map("listing_images")
+}
+
+// ─────────────────────────────────────────────────────────────
+// Saved listings (tin đăng yêu thích)
+// ─────────────────────────────────────────────────────────────
+
+model SavedListing {
+  id        String   @id @default(cuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  listingId String
+  listing   Listing  @relation(fields: [listingId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now())
+
+  @@unique([userId, listingId])
+  @@map("saved_listings")
+}
+
+// ─────────────────────────────────────────────────────────────
+// Moderation log (FR-06, BR-08)
+// ─────────────────────────────────────────────────────────────
+
+model ModerationLog {
+  id          String        @id @default(cuid())
+  listingId   String
+  listing     Listing       @relation(fields: [listingId], references: [id])
+  moderatorId String
+  moderator   User          @relation("ModeratorActions", fields: [moderatorId], references: [id])
+  fromStatus  ListingStatus
+  toStatus    ListingStatus
+  reason      String?
+  createdAt   DateTime      @default(now())
+
+  @@map("moderation_logs")
+}
+
+// ─────────────────────────────────────────────────────────────
+// Internal MLS sharing (FR-07, BR-07)
+// Only APPROVED listings may be shared — enforced at service layer
+// ─────────────────────────────────────────────────────────────
+
+model MlsShare {
+  id           String             @id @default(cuid())
+  listingId    String
+  listing      Listing            @relation(fields: [listingId], references: [id])
+  grantedById  String
+  grantedBy    User               @relation("MlsGrantedBy", fields: [grantedById], references: [id])
+  receivedById String
+  receivedBy   User               @relation("MlsReceivedBy", fields: [receivedById], references: [id])
+  permission   MlsSharePermission @default(VIEW)
+  expiresAt    DateTime?
+  createdAt    DateTime           @default(now())
+
+  @@unique([listingId, receivedById])
+  @@map("mls_shares")
+}
+
+// ─────────────────────────────────────────────────────────────
+// Contact request (FR-08, BR-04, BR-05)
+// ─────────────────────────────────────────────────────────────
+
+model ContactRequest {
+  id             String               @id @default(cuid())
+  listingId      String
+  listing        Listing              @relation(fields: [listingId], references: [id])
+  buyerId        String
+  buyer          User                 @relation("RequestBuyer", fields: [buyerId], references: [id])
+  message        String?              @db.Text
+  /// Explicit buyer consent to share contact info (BR-04)
+  contactConsent Boolean              @default(false)
+  status         ContactRequestStatus @default(NEW)
+  createdAt      DateTime             @default(now())
+  updatedAt      DateTime             @updatedAt
+
+  assignments RequestAssignment[]
+
+  @@map("contact_requests")
+}
+
+// ─────────────────────────────────────────────────────────────
+// Request assignment (FR-09, BR-05, BR-06)
+// Only one active assignment per request at a time.
+// The backend MUST use a transaction when reassigning:
+//   1. Set isActive=false on the current active row.
+//   2. Set releasedAt on the current active row.
+//   3. Insert a new row with isActive=true.
+// A partial unique index (below) provides an additional guard.
+// ─────────────────────────────────────────────────────────────
+
+model RequestAssignment {
+  id               String         @id @default(cuid())
+  contactRequestId String
+  contactRequest   ContactRequest @relation(fields: [contactRequestId], references: [id])
+  agentId          String
+  agent            User           @relation("AssignedAgent", fields: [agentId], references: [id])
+  /// True for the current active assignment; false for historical records (BR-05, BR-06)
+  isActive         Boolean        @default(true)
+  assignedAt       DateTime       @default(now())
+  /// Set when this assignment is superseded or the request completes
+  releasedAt       DateTime?
+
+  @@map("request_assignments")
+}
+
+// ─────────────────────────────────────────────────────────────
+// Audit log — immutable event trail (BR-08)
+// ─────────────────────────────────────────────────────────────
+
+model AuditLog {
+  id         String   @id @default(cuid())
+  actorId    String
+  actor      User     @relation(fields: [actorId], references: [id])
+  /// Verb-style action identifier, e.g. "listing.approve", "request.reassign"
+  action     String
+  entityType String
+  entityId   String
+  meta       Json?
+  createdAt  DateTime @default(now())
+
+  @@index([entityType, entityId])
+  @@index([actorId])
+  @@map("audit_logs")
+}

@@ -1,0 +1,48 @@
+@import "tailwindcss";
+
+/* ── Design tokens ───────────────────────────────────────── */
+:root {
+  --color-primary:     #0F766E;
+  --color-primary-600: #0D6660;
+  --color-primary-700: #0A524D;
+  --color-navy:        #142B4A;
+  --color-background:  #F8FAFC;
+  --color-surface:     #FFFFFF;
+  --color-border:      #E2E8F0;
+  --color-muted:       #475569;
+  --radius:            8px;
+}
+
+/* ── Reset / base ────────────────────────────────────────── */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html {
+  height: 100%;
+  -webkit-text-size-adjust: 100%;
+}
+
+body {
+  min-height: 100%;
+  background-color: var(--color-background);
+  color: var(--color-navy);
+  font-family: 'Be Vietnam Pro', system-ui, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+img,
+video {
+  display: block;
+  max-width: 100%;
+}
