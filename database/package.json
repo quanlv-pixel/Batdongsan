@@ -8,14 +8,23 @@
     "prisma:format": "prisma format --schema=prisma/schema.prisma",
     "prisma:generate": "prisma generate --schema=prisma/schema.prisma",
     "prisma:migrate:dev": "prisma migrate dev --schema=prisma/schema.prisma",
-    "prisma:migrate:deploy": "prisma migrate deploy --schema=prisma/schema.prisma"
+    "prisma:migrate:deploy": "prisma migrate deploy --schema=prisma/schema.prisma",
+    "prisma:seed": "prisma db seed"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "type": "commonjs",
   "devDependencies": {
+    "@types/bcryptjs": "^2.4.6",
+    "@types/pg": "^8.23.1",
     "dotenv": "^18.0.8",
-    "prisma": "^7.10.1"
+    "prisma": "^7.10.1",
+    "tsx": "^4.23.15"
+  },
+  "dependencies": {
+    "@prisma/adapter-pg": "^7.10.1",
+    "bcryptjs": "^3.0.3",
+    "pg": "^8.23.1"
   }
 }

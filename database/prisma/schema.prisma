@@ -1,20 +1,19 @@
 // ============================================================
 // Batdongsan — Prisma Schema
-// Version: 0.1 | Database: PostgreSQL
+// Version: 0.2 | Database: PostgreSQL
+// Phase 2A: Database Foundation & Schema Refinement
 // ============================================================
 
-
 generator client {
-  provider     = "prisma-client"
-  output       = "../../backend/src/generated/prisma"
-  moduleFormat = "esm"
+  provider        = "prisma-client"
+  output          = "../../backend/src/generated/prisma"
+  moduleFormat    = "esm"
+  previewFeatures = ["partialIndexes"]
 }
 
 datasource db {
   provider = "postgresql"
 }
-
-
 
 // ─────────────────────────────────────────────────────────────
 // Enums
@@ -22,18 +21,25 @@ datasource db {
 
 /// Backend-managed authorization roles (assigned by Admin, not self-selected)
 enum Role {
-  BUYER   // authenticated user; default upon registration
-  OWNER   // granted by Admin after verification
-  AGENT   // granted by Admin
+  BUYER // authenticated user; default upon registration
+  OWNER // granted by Admin after verification
+  AGENT // granted by Admin
   ADMIN
 }
 
+/// Registration intent self-selected by the user (does NOT grant elevated authorization)
+enum RegistrationIntent {
+  BUYER
+  OWNER
+  AGENT
+}
+
 enum ListingStatus {
-  DRAFT     // saved locally, not yet submitted
-  PENDING   // submitted; awaiting moderation
-  APPROVED  // publicly visible (BR-01)
-  REJECTED  // moderation refused
-  ARCHIVED  // taken offline by owner or admin
+  DRAFT // saved locally, not yet submitted
+  PENDING // submitted; awaiting moderation
+  APPROVED // publicly visible (BR-01)
+  REJECTED // moderation refused
+  ARCHIVED // taken offline by owner or admin
 }
 
 enum PropertyType {
@@ -48,6 +54,13 @@ enum PropertyType {
 enum TransactionType {
   FOR_SALE
   FOR_RENT
+}
+
+/// Rental pricing period — required for FOR_RENT transactions (BR conditional rule)
+enum RentalPeriod {
+  MONTH
+  QUARTER
+  YEAR
 }
 
 enum ContactRequestStatus {
@@ -67,32 +80,34 @@ enum MlsSharePermission {
 // ─────────────────────────────────────────────────────────────
 
 model User {
-  id           String   @id @default(cuid())
-  email        String   @unique
-  passwordHash String
-  fullName     String
-  phone        String?
-  avatarUrl    String?
+  id                 String             @id @default(cuid())
+  email              String             @unique
+  passwordHash       String
+  fullName           String
+  phone              String?
+  avatarUrl          String?
+  /// User's self-declared intent at registration (does NOT confer elevated privileges)
+  registrationIntent RegistrationIntent @default(BUYER)
   /// Backend-assigned role — never set directly from registration form (BR-02)
-  role         Role     @default(BUYER)
-  isActive     Boolean  @default(true)
-  createdAt    DateTime @default(now())
-  updatedAt    DateTime @updatedAt
+  role               Role               @default(BUYER)
+  isActive           Boolean            @default(true)
+  createdAt          DateTime           @default(now())
+  updatedAt          DateTime           @updatedAt
 
-  ownedListings       Listing[]           @relation("ListingOwner")
-  moderationActions   ModerationLog[]     @relation("ModeratorActions")
-  mlsSharesGranted    MlsShare[]          @relation("MlsGrantedBy")
-  mlsSharesReceived   MlsShare[]          @relation("MlsReceivedBy")
-  savedListings       SavedListing[]
-  contactRequests     ContactRequest[]    @relation("RequestBuyer")
-  assignedRequests    RequestAssignment[] @relation("AssignedAgent")
-  auditLogs           AuditLog[]
+  ownedListings     Listing[]           @relation("ListingOwner")
+  moderationActions ModerationLog[]     @relation("ModeratorActions")
+  mlsSharesGranted  MlsShare[]          @relation("MlsGrantedBy")
+  mlsSharesReceived MlsShare[]          @relation("MlsReceivedBy")
+  savedListings     SavedListing[]
+  contactRequests   ContactRequest[]    @relation("RequestBuyer")
+  assignedRequests  RequestAssignment[] @relation("AssignedAgent")
+  auditLogs         AuditLog[]
 
   @@map("users")
 }
 
 // ─────────────────────────────────────────────────────────────
-// Listing (tin đăng)
+// Listing (tin đăng — combined property/listing record for MVP)
 // ─────────────────────────────────────────────────────────────
 
 model Listing {
@@ -102,6 +117,8 @@ model Listing {
   propertyType    PropertyType
   transactionType TransactionType
   priceVnd        BigInt
+  /// Rental period — applicable only when transactionType == FOR_RENT (BR conditional rule)
+  rentalPeriod    RentalPeriod?
   areaSqm         Float
 
   // Public address components (safe to expose)
@@ -180,6 +197,7 @@ model ModerationLog {
 // ─────────────────────────────────────────────────────────────
 // Internal MLS sharing (FR-07, BR-07)
 // Only APPROVED listings may be shared — enforced at service layer
+// Preserves grant/revoke history without unconditional uniqueness
 // ─────────────────────────────────────────────────────────────
 
 model MlsShare {
@@ -191,10 +209,17 @@ model MlsShare {
   receivedById String
   receivedBy   User               @relation("MlsReceivedBy", fields: [receivedById], references: [id])
   permission   MlsSharePermission @default(VIEW)
+  /// True if currently active; false if revoked (preserves grant history without deletion)
+  isActive     Boolean            @default(true)
+  /// Timestamp when access was revoked (BR-07)
+  revokedAt    DateTime?
   expiresAt    DateTime?
   createdAt    DateTime           @default(now())
 
-  @@unique([listingId, receivedById])
+  @@unique([listingId, receivedById], where: { isActive: true })
+  @@index([listingId])
+  @@index([receivedById])
+  @@index([isActive])
   @@map("mls_shares")
 }
 
@@ -223,11 +248,9 @@ model ContactRequest {
 // ─────────────────────────────────────────────────────────────
 // Request assignment (FR-09, BR-05, BR-06)
 // Only one active assignment per request at a time.
-// The backend MUST use a transaction when reassigning:
-//   1. Set isActive=false on the current active row.
-//   2. Set releasedAt on the current active row.
-//   3. Insert a new row with isActive=true.
-// A partial unique index (below) provides an additional guard.
+// Enforced declaratively by partial unique index:
+//   @@unique([contactRequestId], where: { isActive: true })
+// The backend service MUST also use a transaction when reassigning.
 // ─────────────────────────────────────────────────────────────
 
 model RequestAssignment {
@@ -242,6 +265,9 @@ model RequestAssignment {
   /// Set when this assignment is superseded or the request completes
   releasedAt       DateTime?
 
+  @@unique([contactRequestId], where: { isActive: true })
+  @@index([contactRequestId])
+  @@index([agentId])
   @@map("request_assignments")
 }
 
