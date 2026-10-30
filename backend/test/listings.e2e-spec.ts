@@ -17,6 +17,7 @@ describe('Listings HTTP-level Integration Tests (Real PostgreSQL)', () => {
 
   // Track records created during this test run for guaranteed cleanup
   const createdListingIds: string[] = [];
+  const createdUserIds: string[] = [];
 
   beforeAll(async () => {
     initEnvironment();
@@ -79,9 +80,13 @@ describe('Listings HTTP-level Integration Tests (Real PostgreSQL)', () => {
           where: { id: { in: createdListingIds } },
         });
       }
+      if (createdUserIds.length > 0) {
+        await prisma.user.deleteMany({ where: { id: { in: createdUserIds } } });
+      }
       const after = await takeFingerprint();
       console.log(
         `[isolation] run-created listings cleaned: ${createdListingIds.length}; ` +
+          `run-created users cleaned: ${createdUserIds.length}; ` +
           `baseline=${JSON.stringify(baseline)} after=${JSON.stringify(after)}`,
       );
       expect(after).toEqual(baseline);
@@ -379,6 +384,70 @@ describe('Listings HTTP-level Integration Tests (Real PostgreSQL)', () => {
           expect(Object.keys(img).sort()).toEqual(['id', 'order', 'url']);
         }
       }
+    });
+  });
+
+  // ─────────────────────────────────────────────────────────────
+  // REAL-DB AUTH: stale token privileges and inactive users.
+  // Uses a temporary user created and deleted by this run only.
+  // ─────────────────────────────────────────────────────────────
+  describe('Auth on real PostgreSQL with a run-created user', () => {
+    let tempUserId: string;
+    let tempToken: string;
+
+    beforeAll(async () => {
+      const user = await prisma.user.create({
+        data: {
+          email: `e2e_auth_${Date.now()}@example.test`,
+          passwordHash: 'not-a-login-credential',
+          fullName: 'E2E Temporary Admin',
+          role: 'ADMIN',
+          isActive: true,
+        },
+        select: { id: true, email: true },
+      });
+      tempUserId = user.id;
+      createdUserIds.push(user.id);
+      tempToken = jwtService.sign({
+        sub: user.id,
+        email: user.email,
+        role: 'ADMIN',
+        fullName: 'E2E Temporary Admin',
+      });
+    });
+
+    it('token issued while ADMIN works, then loses ADMIN access after DB downgrade (403)', async () => {
+      await request(app.getHttpServer())
+        .get('/api/listings/seed_listing_01/moderation-history')
+        .set('Authorization', `Bearer ${tempToken}`)
+        .expect(200);
+
+      await prisma.user.update({ where: { id: tempUserId }, data: { role: 'BUYER' } });
+
+      await request(app.getHttpServer())
+        .get('/api/listings/seed_listing_01/moderation-history')
+        .set('Authorization', `Bearer ${tempToken}`)
+        .expect(403);
+
+      const me = await request(app.getHttpServer())
+        .get('/api/auth/me')
+        .set('Authorization', `Bearer ${tempToken}`)
+        .expect(200);
+      expect(me.body.role).toBe('BUYER');
+      expect(me.body.passwordHash).toBeUndefined();
+    });
+
+    it('still-valid token is rejected with 401 once the user is deactivated', async () => {
+      await prisma.user.update({ where: { id: tempUserId }, data: { isActive: false } });
+
+      await request(app.getHttpServer())
+        .get('/api/auth/me')
+        .set('Authorization', `Bearer ${tempToken}`)
+        .expect(401);
+      await request(app.getHttpServer())
+        .get('/api/listings/mine')
+        .set('Authorization', `Bearer ${tempToken}`)
+        .expect(401);
     });
   });
 });

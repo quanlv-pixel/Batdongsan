@@ -172,3 +172,61 @@ Infrastructure
 ```
 
 **Phạm vi tiếp theo đề xuất:** chỉ làm **Internal MLS** (chia sẻ, thu hồi và lịch sử chia sẻ tin APPROVED). Contact Requests/Assignments để sang một giai đoạn riêng.
+
+---
+
+## 7. Lượt 5 — Xác minh lại sau checkpoint (30/10/2026, 20:19–20:26)
+
+> [!NOTE]
+> Các mục 1–6 ở trên là lịch sử, được giữ nguyên. Dòng "chưa commit" ở đầu báo cáo **không còn đúng**: Phase 2B + 2C đã được commit tại `bf9d6eb` và push lên `origin/feat/phase2c-listings`.
+
+### 7.1 Trạng thái Git
+
+- Nhánh hiện tại: `feat/phase2d-mls`, HEAD = `bf9d6eb`, chưa có commit MLS nào.
+- `git merge-base --is-ancestor bf9d6eb HEAD` → exit 0.
+- `feat/phase2c-listings` = `bf9d6eb`, đã đồng bộ với `origin/feat/phase2c-listings`.
+- Không có `.env`, `dist/` hay `src/generated/` nào bị track (`git ls-files` → 0 kết quả).
+
+### 7.2 Kiểm tra trên code đã commit (`bf9d6eb`, working tree sạch)
+
+| Lệnh | Loại | Kết quả |
+| :--- | :--- | :--- |
+| `npm test` | Unit, Prisma mock | **PASS** 45/45 |
+| `npm run test:e2e` | HTTP + PostgreSQL thật | **PASS** 14/14 (có 2 test đồng thời thật) |
+| `npm run build` | Biên dịch | **PASS** |
+| `npm run lint` | oxlint | **PASS** 0/0 (29 file) |
+| `git diff --check` | Khoảng trắng | **PASS** |
+
+### 7.3 Bổ sung sau checkpoint (chưa commit)
+
+Lấp khoảng trống "NOT RUN (*)" ở mục 3.1: test e2e tạo **một user tạm** (ADMIN), rồi xóa trong `afterAll`. User seed không bị đụng tới.
+
+- File: `backend/test/listings.e2e-spec.ts` (chỉ sửa test, không sửa code ứng dụng).
+- Token cấp lúc còn ADMIN → `moderation-history` 200; hạ role trong DB xuống BUYER → cùng token đó bị **403**; `/api/auth/me` trả về `role = BUYER`, không có `passwordHash`.
+- Khóa user (`isActive = false`) → token còn hạn bị **401** ở `/api/auth/me` và `/api/listings/mine`.
+
+| Lệnh (sau khi bổ sung) | Kết quả |
+| :--- | :--- |
+| `npm run test:e2e` | **PASS** 16/16 (app 1, listings 15) |
+| `npm run lint` | **PASS** 0/0 |
+| `git diff --check` | **PASS** (chỉ có cảnh báo LF→CRLF) |
+
+Dấu vân tay cách ly:
+
+```text
+[isolation] run-created listings cleaned: 4; run-created users cleaned: 1;
+baseline={"listings":10,"logs":1,"users":5,"listingsMaxUpdatedAt":"2026-10-24T17:03:30.885Z","usersMaxUpdatedAt":"2026-10-24T17:03:30.782Z"}
+after   ={"listings":10,"logs":1,"users":5,"listingsMaxUpdatedAt":"2026-10-24T17:03:30.885Z","usersMaxUpdatedAt":"2026-10-24T17:03:30.782Z"}
+```
+
+Bảng 3.1 cập nhật: hạ role và khóa user → DB thật **PASS**. Rollback khi tạo log thất bại trên DB thật vẫn **NOT RUN** (lý do không đổi, xem (**)).
+
+### 7.4 npm audit (30/10, 20:24)
+
+Vẫn **3 high**, không đổi so với 27/10: `body-parser@2.3.0` (qua `express@5.3.0`), `multer@2.4.0`, `@nestjs/platform-express@12.2.0` (dùng chung với `@nestjs/core` và `@nestjs/testing`). Output báo có `npm audit fix` (không cần `--force`). Chưa áp dụng.
+
+### 7.5 Hạn chế còn lại
+
+1. Rollback khi ghi log thất bại chỉ kiểm tra bằng mock.
+2. Test đồng thời dựa vào `sleep(800ms)`, có thể chập chờn trên máy chậm.
+3. 3 cảnh báo audit high chưa xử lý (nên xử lý trong một nhiệm vụ riêng về dependency).
