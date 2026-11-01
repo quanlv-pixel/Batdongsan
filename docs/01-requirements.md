@@ -133,17 +133,72 @@ Hệ thống cho phép chia sẻ và quản lý tin đăng bất động sản n
 > - Giữ nguyên tính toàn vẹn của mô hình phân quyền và tính tương thích schema enum (`MlsSharePermission: VIEW, MANAGE`).
 
 
-### FR-08: Yêu cầu tư vấn
+### FR-08: Yêu cầu tư vấn (Contact Requests)
 
-Người mua có thể gửi yêu cầu tư vấn hoặc xem bất động sản. Hệ thống ghi nhận nội dung yêu cầu, thời điểm tạo và trạng thái đồng ý chia sẻ thông tin liên hệ.
+Người mua có thể gửi yêu cầu tư vấn hoặc xem bất động sản với các quy định bảo vệ dữ liệu và xác thực chặt chẽ:
+1. **Đối tượng được phép tạo:**
+   - Vai trò được phép: `BUYER`, `OWNER`, `AGENT` đã xác thực.
+   - Quản trị viên (`ADMIN`) không được phép tạo yêu cầu tư vấn.
+   - Người dùng đóng vai trò `OWNER` hoặc `AGENT` có thể gửi yêu cầu với tư cách người mua tiềm năng cho tin đăng của người khác.
+   - **Chống tự gửi yêu cầu:** Nghiêm cấm tạo yêu cầu cho tin đăng do chính mình sở hữu (`listing.ownerId !== caller.id`).
+2. **Điều kiện tin đăng:**
+   - Chỉ áp dụng cho tin đăng đang ở trạng thái `APPROVED`. Từ chối các tin không tồn tại, tin `DRAFT`, `PENDING`, `REJECTED`.
+3. **Đồng ý chia sẻ thông tin liên hệ (Contact Consent):**
+   - Trường `contactConsent` là bắt buộc và phải là `true` khi tạo mới. DTO từ chối nếu thiếu hoặc `false`.
+   - Cam kết quyền riêng tư: Thông tin liên hệ của người mua (`email`, `phone`) chỉ được bộc lộ cho Môi giới được phân công phụ trách (`assigned AGENT`) và Quản trị viên (`ADMIN`), tuyệt đối không chia sẻ cho chủ sở hữu tin đăng (`OWNER`).
+   - Xử lý phòng vệ cho dữ liệu cũ (legacy data): Nếu bản ghi có `contactConsent === false`, môi giới phụ trách cũng sẽ không nhận được email và số điện thoại của người mua.
 
-### FR-09: Phân phối yêu cầu tư vấn
+### FR-09: Phân phối yêu cầu tư vấn tự động (Automatic Agent Assignment)
 
-Hệ thống có thể phân công mỗi yêu cầu cho một nhân viên môi giới đủ điều kiện tại một thời điểm. Việc phân công phải xét trạng thái tài khoản, quyền truy cập và phạm vi phục vụ. Các lần phân công hoặc chuyển giao phải được ghi nhận.
+Hệ thống phân công mỗi yêu cầu cho một nhân viên môi giới đủ điều kiện tại một thời điểm theo chính sách xác định (deterministic MVP policy):
+1. **Ưu tiên 1 — Môi giới là chủ sở hữu tin đăng (Listing-owner Agent):**
+   - Nếu chủ sở hữu tin (`listing.owner`) có `role === AGENT` và `isActive === true`, tự động phân công cho môi giới này.
+2. **Ưu tiên 2 — Môi giới có khối lượng công việc thấp nhất (Lowest Active Workload):**
+   - Nếu chủ tin không phải là môi giới đang hoạt động, xét tất cả các tài khoản có `role === AGENT` và `isActive === true`.
+   - Tính tải công việc hiện tại dựa trên số lượng bản ghi `RequestAssignment` đang hoạt động (`isActive === true`).
+   - Chọn môi giới có số lượng phân công hoạt động ít nhất.
+   - Quy tắc giải quyết hòa (tie-breaking):
+     1. Tài khoản tạo sớm hơn (`User.createdAt` tăng dần).
+     2. Mã người dùng tăng dần (`User.id` tăng dần).
+3. **Xử lý khi không có môi giới đủ điều kiện (No Eligible Agent Fallback):**
+   - Vẫn tạo yêu cầu tư vấn thành công nhưng giữ trạng thái là `NEW` và không tạo bản ghi `RequestAssignment`.
+   - Yêu cầu chưa phân công hiển thị cho `ADMIN` để phân công thủ công qua endpoint `POST /api/contact-requests/:id/assign`.
+4. **Phân công lần đầu (First Assignment):**
+   - Áp dụng khi yêu cầu đang ở trạng thái `NEW` và chưa có phân công hoạt động.
+   - Khi tạo yêu cầu có môi giới tự động, hệ thống tạo bản ghi `RequestAssignment` (`isActive = true`, `assignedAt = now()`) và chuyển trạng thái sang `IN_PROGRESS`.
+   - Nếu tạo tự động rơi vào fallback `NEW` (chưa có phân công), `ADMIN` phân công thủ công qua `POST /api/contact-requests/:id/assign`.
+   - Nếu đã tồn tại phân công hoạt động, `POST /:id/assign` trả về `409 Conflict`.
+5. **Điều phối lại (Reassignment):**
+   - Chỉ `ADMIN` có quyền điều phối lại qua `POST /api/contact-requests/:id/reassign`.
+   - Bắt buộc yêu cầu phải đang có một phân công hoạt động (`isActive === true`). Nếu chưa có phân công nào, API trả về `409 Conflict` kèm thông điệp hướng dẫn sử dụng endpoint `/assign`.
+   - Nghiêm cấm điều phối lại cho chính môi giới đang phụ trách hiện tại (`400 Bad Request`) hoặc điều phối lại trên yêu cầu đã kết thúc (`400 Bad Request`).
+   - Trong một giao dịch cơ sở dữ liệu duy nhất: giải phóng phân công cũ (`isActive = false`, `releasedAt = now()`), tạo phân công mới (`isActive = true`), giữ trạng thái `IN_PROGRESS`, ghi nhật ký `AuditLog` và thu hồi ngay lập tức quyền truy cập của môi giới cũ.
+   - Ràng buộc chỉ mục một phần PostgreSQL (`request_assignments_contactRequestId_key` với `WHERE ("isActive" = true)`) đảm bảo tính toàn vẹn tuyệt đối ở tầng cơ sở dữ liệu. Xung đột ghi đồng thời được bắt chính xác và trả về `409 Conflict`.
 
-### FR-10: Quản lý trạng thái yêu cầu
+### FR-10: Quản lý trạng thái và mở lại yêu cầu (State Machine & Reopen Workflow)
 
-Nhân viên môi giới có thể cập nhật trạng thái yêu cầu theo các bước được hệ thống cho phép, chẳng hạn mới tiếp nhận, đang xử lý, hoàn thành hoặc bị từ chối.
+Trạng thái yêu cầu tư vấn bao gồm: `NEW`, `IN_PROGRESS`, `COMPLETED`, `REJECTED`.
+1. **Ma trận chuyển đổi trạng thái hợp lệ (Status Transition Matrix):**
+   - `NEW` -> `REJECTED`: Chỉ `ADMIN` được phép từ chối yêu cầu chưa phân công.
+   - `NEW` -> `IN_PROGRESS`: Nghiêm cấm qua `PATCH /:id/status` (phải thông qua quy trình phân công `assignAgent`).
+   - `NEW` -> `COMPLETED`: Bị cấm (`400 Bad Request`).
+   - `IN_PROGRESS` -> `COMPLETED`: Môi giới đang được phân công hoạt động hoặc `ADMIN`.
+   - `IN_PROGRESS` -> `REJECTED`: Môi giới đang được phân công hoạt động hoặc `ADMIN`.
+   - `IN_PROGRESS` -> `NEW`: Bị cấm tuyệt đối (`400 Bad Request`).
+   - Cập nhật trạng thái trùng với trạng thái hiện tại: Bị từ chối (`400 Bad Request`).
+   - Các trạng thái `COMPLETED` và `REJECTED` là trạng thái kết thúc (terminal states). Mọi yêu cầu chuyển đổi qua `PATCH /:id/status` đều bị từ chối; bắt buộc phải sử dụng quy trình mở lại dành riêng cho `ADMIN`.
+   - Cập nhật trạng thái sử dụng cập nhật có điều kiện (`conditional update`) trong giao dịch để ngăn chặn triệt để ghi đè do tranh chấp đồng thời (`race conditions`).
+2. **Quy trình mở lại yêu cầu dành riêng cho Quản trị viên (ADMIN Reopen Workflow):**
+   - Chỉ `ADMIN` được phép gọi endpoint `POST /api/contact-requests/:id/reopen`.
+   - Yêu cầu lý do mở lại (`reason`) bắt buộc, được cắt khoảng trắng và không được để trống.
+   - Cơ chế khôi phục: Nếu vẫn còn phân công hoạt động tới môi giới hợp lệ, khôi phục về `IN_PROGRESS`. Nếu không, chuyển về `NEW` và chạy thuật toán phân công tự động; nếu vẫn không có môi giới thì giữ `NEW` chờ phân công thủ công.
+   - Toàn bộ thao tác thực hiện trong giao dịch và ghi nhật ký `AuditLog`.
+3. **Chính sách công bố thông tin (Privacy Allowlists):**
+   - **Người mua (Buyer):** Chỉ xem các yêu cầu của chính mình (`buyerId === caller.id`), nội dung tin nhắn và tóm tắt thông tin môi giới phụ trách (`id`, `name`, `phone` — không lộ email của môi giới).
+   - **Môi giới phụ trách (Assigned Agent):** Chỉ truy cập được yêu cầu khi đang có phân công hoạt động (`isActive === true`). Xem được họ tên người mua; chỉ xem email/sđt nếu `contactConsent === true`. Khi bị điều phối lại hoặc phân công bị hủy (`isActive === false`), mất quyền truy cập ngay lập tức (`403 Forbidden`).
+   - **Chủ sở hữu tin đăng (Listing Owner):** Xem danh sách yêu cầu liên quan đến tin đăng của mình (`GET /api/contact-requests/for-owned-listings`) nhưng chỉ nhận danh sách rút gọn siêu dữ liệu (Metadata-only allowlist: `id`, `listingId`, `status`, `createdAt`, `updatedAt`, tóm tắt tin). **Tuyệt đối không nhận** họ tên, email, sđt, mã người mua, nội dung tin nhắn hoặc lịch sử môi giới.
+   - **Quản trị viên (ADMIN):** Xem toàn bộ danh sách, thông tin chi tiết người mua, lịch sử phân công. Lọc danh sách hỗ trợ validate tham số chặt chẽ (từ chối `unassigned` không hợp lệ với 400; từ chối kết hợp đồng thời `agentId` và `unassigned=true` với 400).
+   - **Bảo mật thông tin xác thực:** Tuyệt đối không để lộ `passwordHash` trong bất kỳ phản hồi API nào.
 
 ### FR-11: Quản lý tài khoản
 
@@ -207,7 +262,8 @@ Các chức năng quan trọng cần có trường hợp kiểm thử, đặc bi
 
 - Bản đồ tương tác.
 - Thông báo qua email.
-- Gói dịch vụ môi giới mô phỏng.
+- Gói dịch vụ môi giới mô phỏng (Agent subscription-tier matching: phân công theo thứ hạng gói thuê bao được hoãn lại sau MVP).
+- Phân công môi giới theo khu vực địa lý (Agent service-area matching: hoãn lại sau MVP do bảng User chưa lưu trữ dữ liệu vùng phục vụ).
 - Danh sách bất động sản yêu thích.
 - Biểu đồ thống kê nâng cao.
 - Tích hợp thanh toán trực tuyến hoặc nguồn dữ liệu MLS bên ngoài.
