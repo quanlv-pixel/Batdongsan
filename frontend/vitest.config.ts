@@ -8,10 +8,18 @@ export default defineConfig({
     environment: 'jsdom',
     globals: true,
     setupFiles: ['./vitest.setup.ts'],
+    server: {
+      deps: {
+        inline: ['next-intl'],
+      },
+    },
   },
   resolve: {
     alias: {
       '@': path.resolve(__dirname, './src'),
+      'next/server': path.resolve(__dirname, './node_modules/next/server.js'),
+      'next/navigation': path.resolve(__dirname, './node_modules/next/navigation.js'),
+      'next/headers': path.resolve(__dirname, './node_modules/next/headers.js'),
     },
   },
 });

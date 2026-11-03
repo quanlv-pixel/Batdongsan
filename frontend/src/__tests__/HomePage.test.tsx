@@ -1,7 +1,7 @@
 import React from 'react';
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 import { render, screen } from '@testing-library/react';
-import { HomePageShell, LatestListingsSection } from '@/app/page';
+import { HomePageShell, LatestListingsSection } from '@/app/[locale]/page';
 import * as AuthContextModule from '@/context/AuthContext';
 import { PublicListingsResponse } from '@/types';
 

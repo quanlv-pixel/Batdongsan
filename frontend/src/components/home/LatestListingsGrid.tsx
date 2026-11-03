@@ -1,7 +1,10 @@
+'use client';
+
 import React from 'react';
 import Link from 'next/link';
 import { PublicListingSummary } from '@/types';
 import { ListingCard } from './ListingCard';
+import { useDictionary, useLocalizedHref } from '@/i18n';
 
 interface LatestListingsGridProps {
   listings: PublicListingSummary[];
@@ -14,6 +17,9 @@ export function LatestListingsGrid({
   isLoading = false,
   error = null,
 }: LatestListingsGridProps) {
+  const dict = useDictionary();
+  const localizeHref = useLocalizedHref();
+
   return (
     <section
       aria-labelledby="latest-listings-heading"
@@ -26,26 +32,25 @@ export function LatestListingsGrid({
             <div className="flex items-center gap-2 mb-1">
               <span className="inline-block w-2.5 h-2.5 rounded-full bg-[#0F766E]" />
               <span className="text-xs font-semibold tracking-wider text-[#0F766E] uppercase">
-                Tin đăng đã kiểm duyệt
+                {dict.LatestListings.verifiedBadge}
               </span>
             </div>
             <h2
               id="latest-listings-heading"
               className="text-2xl font-bold text-[#142B4A]"
             >
-              Bất động sản mới nhất
+              {dict.LatestListings.heading}
             </h2>
             <p className="text-sm text-[#475569] mt-1">
-              Các bất động sản vừa được phê duyệt và công bố công khai trên hệ
-              thống
+              {dict.LatestListings.subtitle}
             </p>
           </div>
 
           <Link
-            href="/bat-dong-san"
+            href={localizeHref('/bat-dong-san')}
             className="mt-4 md:mt-0 text-sm font-semibold text-[#0F766E] hover:underline flex items-center gap-1 group w-fit"
           >
-            <span>Xem tất cả tin đăng</span>
+            <span>{dict.LatestListings.viewAll}</span>
             <span className="material-symbols-outlined text-base transition-transform group-hover:translate-x-1">
               arrow_forward
             </span>
@@ -57,7 +62,7 @@ export function LatestListingsGrid({
           <div
             data-testid="listings-loading-skeleton"
             aria-busy="true"
-            aria-label="Đang tải danh sách bất động sản"
+            aria-label={dict.LatestListings.loadingAriaLabel}
             className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"
           >
             {Array.from({ length: 6 }).map((_, index) => (
@@ -90,7 +95,7 @@ export function LatestListingsGrid({
               </span>
             </div>
             <h3 className="text-base font-bold text-[#142B4A] mb-1">
-              Không thể tải danh sách bất động sản
+              {dict.LatestListings.errorHeading}
             </h3>
             <p className="text-sm text-[#475569]">{error}</p>
           </div>
@@ -106,11 +111,10 @@ export function LatestListingsGrid({
               <span className="material-symbols-outlined text-2xl">domain</span>
             </div>
             <h3 className="text-base font-bold text-[#142B4A] mb-1">
-              Chưa có tin đăng bất động sản nào
+              {dict.LatestListings.emptyHeading}
             </h3>
             <p className="text-sm text-[#475569]">
-              Hiện tại chưa có bất động sản nào được duyệt hiển thị công khai.
-              Vui lòng quay lại sau.
+              {dict.LatestListings.emptyDescription}
             </p>
           </div>
         )}

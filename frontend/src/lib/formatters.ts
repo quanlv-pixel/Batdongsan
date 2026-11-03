@@ -4,6 +4,7 @@ import {
   RentalPeriod,
   TransactionType,
 } from '@/types';
+import { AppLocale, DEFAULT_LOCALE } from '@/i18n/routing';
 
 const ZERO = BigInt(0);
 const ONE = BigInt(1);
@@ -28,37 +29,74 @@ const VALID_TRANSACTION_TYPES: ReadonlySet<TransactionType> = new Set([
   'FOR_RENT',
 ]);
 
-const RENTAL_PERIOD_LABELS: Record<RentalPeriod, string> = {
-  MONTH: '/tháng',
-  QUARTER: '/quý',
-  YEAR: '/năm',
+const RENTAL_PERIOD_LABELS: Record<AppLocale, Record<RentalPeriod, string>> = {
+  vi: {
+    MONTH: '/tháng',
+    QUARTER: '/quý',
+    YEAR: '/năm',
+  },
+  en: {
+    MONTH: '/month',
+    QUARTER: '/quarter',
+    YEAR: '/year',
+  },
 };
 
-const PROPERTY_TYPE_LABELS: Record<PropertyType, string> = {
-  APARTMENT: 'Căn hộ chung cư',
-  HOUSE: 'Nhà ở',
-  VILLA: 'Biệt thự',
-  LAND: 'Đất nền',
-  COMMERCIAL: 'Thương mại / Văn phòng',
-  OTHER: 'Bất động sản khác',
+const PROPERTY_TYPE_LABELS: Record<AppLocale, Record<PropertyType, string>> = {
+  vi: {
+    APARTMENT: 'Căn hộ chung cư',
+    HOUSE: 'Nhà ở',
+    VILLA: 'Biệt thự',
+    LAND: 'Đất nền',
+    COMMERCIAL: 'Thương mại / Văn phòng',
+    OTHER: 'Bất động sản khác',
+  },
+  en: {
+    APARTMENT: 'Apartment',
+    HOUSE: 'House',
+    VILLA: 'Villa',
+    LAND: 'Land',
+    COMMERCIAL: 'Commercial / Office',
+    OTHER: 'Other Property',
+  },
 };
 
-const SALE_BADGE_LABELS: Record<PropertyType, string> = {
-  APARTMENT: 'Bán căn hộ',
-  HOUSE: 'Bán nhà ở',
-  VILLA: 'Bán biệt thự',
-  LAND: 'Bán đất nền',
-  COMMERCIAL: 'Bán mặt bằng / VP',
-  OTHER: 'Mua bán BĐS',
+const SALE_BADGE_LABELS: Record<AppLocale, Record<PropertyType, string>> = {
+  vi: {
+    APARTMENT: 'Bán căn hộ',
+    HOUSE: 'Bán nhà ở',
+    VILLA: 'Bán biệt thự',
+    LAND: 'Bán đất nền',
+    COMMERCIAL: 'Bán mặt bằng / VP',
+    OTHER: 'Mua bán BĐS',
+  },
+  en: {
+    APARTMENT: 'Apartment for Sale',
+    HOUSE: 'House for Sale',
+    VILLA: 'Villa for Sale',
+    LAND: 'Land for Sale',
+    COMMERCIAL: 'Commercial for Sale',
+    OTHER: 'Property for Sale',
+  },
 };
 
-const RENT_BADGE_LABELS: Record<PropertyType, string> = {
-  APARTMENT: 'Thuê căn hộ',
-  HOUSE: 'Thuê nhà ở',
-  VILLA: 'Thuê biệt thự',
-  LAND: 'Thuê đất',
-  COMMERCIAL: 'Thuê mặt bằng / VP',
-  OTHER: 'Cho thuê BĐS',
+const RENT_BADGE_LABELS: Record<AppLocale, Record<PropertyType, string>> = {
+  vi: {
+    APARTMENT: 'Thuê căn hộ',
+    HOUSE: 'Thuê nhà ở',
+    VILLA: 'Thuê biệt thự',
+    LAND: 'Thuê đất',
+    COMMERCIAL: 'Thuê mặt bằng / VP',
+    OTHER: 'Cho thuê BĐS',
+  },
+  en: {
+    APARTMENT: 'Apartment for Rent',
+    HOUSE: 'House for Rent',
+    VILLA: 'Villa for Rent',
+    LAND: 'Land for Rent',
+    COMMERCIAL: 'Commercial for Rent',
+    OTHER: 'Property for Rent',
+  },
 };
 
 /**
@@ -100,22 +138,26 @@ export function parsePositiveBigInt(
 }
 
 /**
- * Formats a two-digit BigInt fraction (0..99) using Vietnamese comma separator,
- * stripping unnecessary trailing zeros (e.g. 20 -> ",2", 65 -> ",65", 0 -> "").
+ * Formats a two-digit BigInt fraction (0..99) using locale decimal separator,
+ * stripping unnecessary trailing zeros (e.g. 20 -> ",2" or ".2", 65 -> ",65" or ".65", 0 -> "").
  */
-function formatHundredthsSuffix(hundredths: bigint): string {
+function formatHundredthsSuffix(
+  hundredths: bigint,
+  locale: AppLocale = DEFAULT_LOCALE,
+): string {
   if (hundredths <= ZERO) {
     return '';
   }
+  const sep = locale === 'en' ? '.' : ',';
   if (hundredths % TEN === ZERO) {
-    return `,${(hundredths / TEN).toString()}`;
+    return `${sep}${(hundredths / TEN).toString()}`;
   }
-  return `,${hundredths.toString().padStart(2, '0')}`;
+  return `${sep}${hundredths.toString().padStart(2, '0')}`;
 }
 
 /**
- * Formats a Backend VND price value into Vietnamese currency notation
- * (e.g., "3200000000" -> "3,2 tỷ", "850000000" -> "850 triệu").
+ * Formats a Backend VND price value into localized VND currency notation
+ * (vi: "3,2 tỷ", "850 triệu"; en: "3.2B VND", "850M VND").
  * Appends rental period suffix only when transactionType is FOR_RENT.
  */
 export function formatVndPrice(
@@ -123,11 +165,13 @@ export function formatVndPrice(
   options?: {
     transactionType?: TransactionType;
     rentalPeriod?: RentalPeriod | null;
+    locale?: AppLocale;
   },
 ): string {
+  const locale: AppLocale = options?.locale === 'en' ? 'en' : 'vi';
   const amount = parsePositiveBigInt(priceVnd);
   if (amount === null) {
-    return 'Liên hệ';
+    return locale === 'en' ? 'Contact for price' : 'Liên hệ';
   }
 
   let formattedCore: string;
@@ -140,7 +184,11 @@ export function formatVndPrice(
       whole += ONE;
       hundredths = ZERO;
     }
-    formattedCore = `${whole.toString()}${formatHundredthsSuffix(hundredths)} tỷ`;
+    const suffix = formatHundredthsSuffix(hundredths, locale);
+    formattedCore =
+      locale === 'en'
+        ? `${whole.toString()}${suffix}B VND`
+        : `${whole.toString()}${suffix} tỷ`;
   } else if (amount >= MILLION) {
     let whole = amount / MILLION;
     const rem = amount % MILLION;
@@ -150,33 +198,47 @@ export function formatVndPrice(
       hundredths = ZERO;
     }
     if (whole >= THOUSAND) {
-      formattedCore = '1 tỷ';
+      formattedCore = locale === 'en' ? '1B VND' : '1 tỷ';
     } else {
-      formattedCore = `${whole.toString()}${formatHundredthsSuffix(hundredths)} triệu`;
+      const suffix = formatHundredthsSuffix(hundredths, locale);
+      formattedCore =
+        locale === 'en'
+          ? `${whole.toString()}${suffix}M VND`
+          : `${whole.toString()}${suffix} triệu`;
     }
   } else if (amount >= THOUSAND) {
     const wholeThousands = (amount + THOUSAND / TWO) / THOUSAND;
-    formattedCore = `${wholeThousands.toString()} nghìn`;
+    formattedCore =
+      locale === 'en'
+        ? `${wholeThousands.toString()}K VND`
+        : `${wholeThousands.toString()} nghìn`;
   } else {
-    formattedCore = `${amount.toString()} đồng`;
+    formattedCore =
+      locale === 'en'
+        ? `${amount.toString()} VND`
+        : `${amount.toString()} đồng`;
   }
 
+  const periodLabels = RENTAL_PERIOD_LABELS[locale];
   if (
     options?.transactionType === 'FOR_RENT' &&
     options.rentalPeriod &&
-    RENTAL_PERIOD_LABELS[options.rentalPeriod]
+    periodLabels[options.rentalPeriod]
   ) {
-    return `${formattedCore}${RENTAL_PERIOD_LABELS[options.rentalPeriod]}`;
+    return `${formattedCore}${periodLabels[options.rentalPeriod]}`;
   }
 
   return formattedCore;
 }
 
 /**
- * Formats area in square meters using Vietnamese locale conventions.
+ * Formats area in square meters using locale decimal conventions.
  * Returns empty string for invalid or non-positive numbers.
  */
-export function formatArea(areaSqm: number | null | undefined): string {
+export function formatArea(
+  areaSqm: number | null | undefined,
+  locale: AppLocale = DEFAULT_LOCALE,
+): string {
   if (
     typeof areaSqm !== 'number' ||
     !Number.isFinite(areaSqm) ||
@@ -186,7 +248,8 @@ export function formatArea(areaSqm: number | null | undefined): string {
   }
 
   const rounded = Math.round(areaSqm * 100) / 100;
-  const formattedNumber = rounded.toString().replace('.', ',');
+  const formattedNumber =
+    locale === 'en' ? rounded.toString() : rounded.toString().replace('.', ',');
   return `${formattedNumber} m²`;
 }
 
@@ -198,6 +261,7 @@ export function formatPricePerSqm(
   priceVnd: string | bigint | number | null | undefined,
   areaSqm: number | null | undefined,
   transactionType: TransactionType = 'FOR_SALE',
+  locale: AppLocale = DEFAULT_LOCALE,
 ): string | null {
   if (transactionType === 'FOR_RENT') {
     return null;
@@ -226,6 +290,8 @@ export function formatPricePerSqm(
     return null;
   }
 
+  const sep = locale === 'en' ? '.' : ',';
+
   if (perSqmVnd >= BILLION) {
     let whole = perSqmVnd / BILLION;
     const rem = perSqmVnd % BILLION;
@@ -234,14 +300,18 @@ export function formatPricePerSqm(
       whole += ONE;
       tenths = ZERO;
     }
-    const suffix = tenths > ZERO ? `,${tenths.toString()}` : '';
-    return `~ ${whole.toString()}${suffix} tỷ/m²`;
+    const suffix = tenths > ZERO ? `${sep}${tenths.toString()}` : '';
+    return locale === 'en'
+      ? `~ ${whole.toString()}${suffix}B VND/m²`
+      : `~ ${whole.toString()}${suffix} tỷ/m²`;
   }
 
   if (perSqmVnd >= MILLION) {
     const roundedMillions = (perSqmVnd + MILLION / TWO) / MILLION;
     if (roundedMillions >= TEN) {
-      return `~ ${roundedMillions.toString()} tr/m²`;
+      return locale === 'en'
+        ? `~ ${roundedMillions.toString()}M VND/m²`
+        : `~ ${roundedMillions.toString()} tr/m²`;
     }
     let whole = perSqmVnd / MILLION;
     const rem = perSqmVnd % MILLION;
@@ -250,24 +320,29 @@ export function formatPricePerSqm(
       whole += ONE;
       tenths = ZERO;
     }
-    const suffix = tenths > ZERO ? `,${tenths.toString()}` : '';
-    return `~ ${whole.toString()}${suffix} tr/m²`;
+    const suffix = tenths > ZERO ? `${sep}${tenths.toString()}` : '';
+    return locale === 'en'
+      ? `~ ${whole.toString()}${suffix}M VND/m²`
+      : `~ ${whole.toString()}${suffix} tr/m²`;
   }
 
   if (perSqmVnd >= THOUSAND) {
     const thousands = (perSqmVnd + THOUSAND / TWO) / THOUSAND;
-    return `~ ${thousands.toString()} nghìn/m²`;
+    return locale === 'en'
+      ? `~ ${thousands.toString()}K VND/m²`
+      : `~ ${thousands.toString()} nghìn/m²`;
   }
 
   return null;
 }
 
 /**
- * Formats an ISO date string or Date into dd/MM/yyyy using Vietnamese conventions.
+ * Formats an ISO date string or Date using locale conventions.
  * Returns empty string for missing or invalid dates.
  */
 export function formatListingDate(
   dateInput: string | Date | null | undefined,
+  locale: AppLocale = DEFAULT_LOCALE,
 ): string {
   if (!dateInput) {
     return '';
@@ -276,6 +351,15 @@ export function formatListingDate(
   const date = dateInput instanceof Date ? dateInput : new Date(dateInput);
   if (Number.isNaN(date.getTime())) {
     return '';
+  }
+
+  if (locale === 'en') {
+    return new Intl.DateTimeFormat('en-GB', {
+      day: '2-digit',
+      month: 'short',
+      year: 'numeric',
+      timeZone: 'UTC',
+    }).format(date);
   }
 
   return new Intl.DateTimeFormat('vi-VN', {
@@ -301,18 +385,32 @@ export function formatAdministrativeLocation(location: {
   return parts.join(', ');
 }
 
-export function getPropertyTypeLabel(propertyType: PropertyType): string {
-  return PROPERTY_TYPE_LABELS[propertyType] ?? 'Bất động sản';
+export function getPropertyTypeLabel(
+  propertyType: PropertyType,
+  locale: AppLocale = DEFAULT_LOCALE,
+): string {
+  const map = PROPERTY_TYPE_LABELS[locale === 'en' ? 'en' : 'vi'];
+  return (
+    map[propertyType] ?? (locale === 'en' ? 'Property' : 'Bất động sản')
+  );
 }
 
 export function getTransactionBadgeLabel(
   transactionType: TransactionType,
   propertyType: PropertyType,
+  locale: AppLocale = DEFAULT_LOCALE,
 ): string {
+  const safeLocale: AppLocale = locale === 'en' ? 'en' : 'vi';
   if (transactionType === 'FOR_RENT') {
-    return RENT_BADGE_LABELS[propertyType] ?? 'Cho thuê BĐS';
+    return (
+      RENT_BADGE_LABELS[safeLocale][propertyType] ??
+      (safeLocale === 'en' ? 'Property for Rent' : 'Cho thuê BĐS')
+    );
   }
-  return SALE_BADGE_LABELS[propertyType] ?? 'Mua bán BĐS';
+  return (
+    SALE_BADGE_LABELS[safeLocale][propertyType] ??
+    (safeLocale === 'en' ? 'Property for Sale' : 'Mua bán BĐS')
+  );
 }
 
 /**

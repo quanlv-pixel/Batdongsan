@@ -1,0 +1,323 @@
+{
+  "Metadata": {
+    "homeTitle": "Batdongsan – Tìm kiếm & Quản lý Bất động sản",
+    "homeDescription": "Nền tảng tìm kiếm, đăng tin và quản lý bất động sản tích hợp MLS nội bộ dành cho người mua, chủ sở hữu và môi giới.",
+    "loginTitle": "Đăng nhập | Batdongsan",
+    "loginDescription": "Đăng nhập vào nền tảng Batdongsan để quản lý tin đăng, theo dõi bất động sản và kết nối giao dịch minh bạch.",
+    "registerTitle": "Đăng ký tài khoản | Batdongsan",
+    "registerDescription": "Tạo tài khoản Batdongsan dành cho người mua, chủ sở hữu bất động sản và môi giới chuyên nghiệp."
+  },
+  "LanguageSwitcher": {
+    "ariaLabel": "Chọn ngôn ngữ hiển thị",
+    "viLabel": "Tiếng Việt",
+    "enLabel": "English",
+    "viShort": "VI",
+    "enShort": "EN"
+  },
+  "Navbar": {
+    "brandName": "Batdongsan",
+    "brandSubtitle": "Hệ thống thông tin",
+    "mainNavAriaLabel": "Điều hướng chính",
+    "home": "Trang chủ",
+    "forSale": "Mua bán",
+    "forRent": "Cho thuê",
+    "login": "Đăng nhập",
+    "register": "Đăng ký",
+    "logout": "Đăng xuất",
+    "toggleMenuAriaLabel": "Toggle navigation menu",
+    "roles": {
+      "ADMIN": "Quản trị viên",
+      "AGENT": "Môi giới",
+      "OWNER": "Chủ nhà",
+      "BUYER": "Người mua"
+    }
+  },
+  "Footer": {
+    "brandName": "Batdongsan",
+    "description": "Nền tảng tìm kiếm và quản lý bất động sản trực tuyến tiện lợi, an tâm. Cầu nối thị trường minh bạch tích hợp mô-đun chia sẻ nội bộ (MLS).",
+    "exploreHeading": "Khám phá bất động sản",
+    "forSaleLink": "Bất động sản Mua bán",
+    "forRentLink": "Bất động sản Cho thuê",
+    "apartmentLink": "Căn hộ chung cư",
+    "houseLink": "Nhà ở & Nhà phố",
+    "customerHeading": "Dành cho khách hàng",
+    "homeLink": "Trang chủ hệ thống",
+    "loginLink": "Truy cập tài khoản",
+    "registerLink": "Mở tài khoản thành viên",
+    "supportHeading": "Hỗ trợ",
+    "supportEmailLabel": "Email hỗ trợ:",
+    "workingHoursLabel": "Giờ làm việc:",
+    "workingHoursValue": "Thứ 2 - Thứ 6 (8h00 - 18h00)",
+    "copyright": "© 2026 Batdongsan. Nền tảng học thuật phục vụ đồ án công nghệ thông tin.",
+    "operatingRules": "Quy chế hoạt động",
+    "privacyPolicy": "Chính sách bảo mật",
+    "termsOfService": "Điều khoản dịch vụ"
+  },
+  "HeroSearch": {
+    "title": "Tìm bất động sản phù hợp với bạn",
+    "subtitle": "Khám phá nơi ở lý tưởng và cơ hội đầu tư phù hợp với nhu cầu của bạn.",
+    "tablistAriaLabel": "Hình thức giao dịch",
+    "tabSale": "Mua bán",
+    "tabRent": "Cho thuê",
+    "tabProject": "Dự án",
+    "comingSoon": "Sắp ra mắt",
+    "projectTooltip": "Mô-đun Dự án đang phát triển",
+    "provinceLabel": "Tỉnh / Thành phố",
+    "provincePlaceholder": "VD: TP. Hồ Chí Minh",
+    "districtLabel": "Quận / Huyện",
+    "districtPlaceholder": "VD: Quận 1",
+    "propertyTypeLabel": "Loại bất động sản",
+    "propertyTypeAll": "Tất cả loại BĐS",
+    "propertyTypes": {
+      "APARTMENT": "Căn hộ chung cư",
+      "HOUSE": "Nhà ở / Nhà phố",
+      "VILLA": "Biệt thự",
+      "LAND": "Đất nền",
+      "COMMERCIAL": "Thương mại / Văn phòng",
+      "OTHER": "Bất động sản khác"
+    },
+    "priceRangeLabel": "Khoảng giá",
+    "pricePlaceholder": "Mức giá (VNĐ)",
+    "salePricePresets": {
+      "under-2b": "Dưới 2 tỷ",
+      "2b-3b": "2 - 3 tỷ",
+      "3b-5b": "3 - 5 tỷ",
+      "5b-10b": "5 - 10 tỷ",
+      "above-10b": "Trên 10 tỷ"
+    },
+    "rentPricePresets": {
+      "under-10m": "Dưới 10 triệu",
+      "10m-20m": "10 - 20 triệu",
+      "20m-50m": "20 - 50 triệu",
+      "above-50m": "Trên 50 triệu"
+    },
+    "areaLabel": "Diện tích",
+    "areaPlaceholder": "Diện tích (m²)",
+    "areaPresets": {
+      "under-50": "Dưới 50 m²",
+      "50-80": "50 - 80 m²",
+      "80-120": "80 - 120 m²",
+      "120-200": "120 - 200 m²",
+      "above-200": "Trên 200 m²"
+    },
+    "searchButton": "Tìm kiếm",
+    "minPriceLabel": "Giá tối thiểu (VNĐ)",
+    "minPricePlaceholder": "VD: 2000000000",
+    "maxPriceLabel": "Giá tối đa (VNĐ)",
+    "maxPricePlaceholder": "VD: 5000000000",
+    "minAreaLabel": "Diện tích tối thiểu (m²)",
+    "minAreaPlaceholder": "VD: 50",
+    "maxAreaLabel": "Diện tích tối đa (m²)",
+    "maxAreaPlaceholder": "VD: 120"
+  },
+  "CategoryGrid": {
+    "heading": "Khám phá bất động sản",
+    "subtitle": "Lựa chọn loại hình phù hợp với mục tiêu tìm kiếm của bạn",
+    "viewAll": "Xem tất cả bất động sản",
+    "items": {
+      "APARTMENT": {
+        "label": "Căn hộ chung cư",
+        "subtitle": "Chung cư & căn hộ dịch vụ"
+      },
+      "HOUSE": {
+        "label": "Nhà ở & Nhà phố",
+        "subtitle": "Nhà riêng lẻ & nhà mặt phố"
+      },
+      "LAND": {
+        "label": "Đất nền",
+        "subtitle": "Đất thổ cư & đất phân lô"
+      },
+      "VILLA": {
+        "label": "Biệt thự",
+        "subtitle": "Biệt thự đơn lập & song lập"
+      },
+      "COMMERCIAL": {
+        "label": "Văn phòng & Thương mại",
+        "subtitle": "Mặt bằng & tòa nhà văn phòng"
+      },
+      "OTHER": {
+        "label": "Loại hình khác",
+        "subtitle": "Kho xưởng & bất động sản khác"
+      }
+    }
+  },
+  "LatestListings": {
+    "verifiedBadge": "Tin đăng đã kiểm duyệt",
+    "heading": "Bất động sản mới nhất",
+    "subtitle": "Các bất động sản vừa được phê duyệt và công bố công khai trên hệ thống",
+    "viewAll": "Xem tất cả tin đăng",
+    "loadingAriaLabel": "Đang tải danh sách bất động sản",
+    "errorHeading": "Không thể tải danh sách bất động sản",
+    "defaultFetchError": "Không thể tải danh sách bất động sản lúc này. Vui lòng thử lại sau.",
+    "emptyHeading": "Chưa có tin đăng bất động sản nào",
+    "emptyDescription": "Hiện tại chưa có bất động sản nào được duyệt hiển thị công khai. Vui lòng quay lại sau.",
+    "noImage": "Chưa có hình ảnh",
+    "photosCount": "{count} ảnh"
+  },
+  "TrustBenefits": {
+    "heading": "Nền tảng giao dịch bất động sản an tâm & hiệu quả",
+    "subtitle": "Mang đến trải nghiệm kết nối tin cậy giữa người mua, người bán và mạng lưới môi giới chuyên nghiệp.",
+    "items": {
+      "search": {
+        "title": "Tìm kiếm thuận tiện",
+        "description": "Bộ lọc đa tiêu chí chính xác, nhanh chóng theo khu vực và tầm giá mong muốn. Dễ dàng so sánh mức giá và diện tích phù hợp với ngân sách gia đình bạn."
+      },
+      "transparency": {
+        "title": "Thông tin minh bạch",
+        "description": "Dữ liệu thuộc tính rõ ràng về mức giá, diện tích và khu vực hành chính. Tin đăng được kiểm duyệt cẩn trọng trước khi công bố công khai."
+      },
+      "management": {
+        "title": "Quản lý tin đăng chuyên nghiệp",
+        "description": "Nền tảng hỗ trợ môi giới và chủ nhà chia sẻ, cập nhật trạng thái tin tức thời qua mô-đun kết nối nội bộ hiệu quả, tối ưu thời gian giao dịch."
+      }
+    }
+  },
+  "OwnerCta": {
+    "badge": "Dành riêng cho chủ nhà & môi giới",
+    "heading": "Bạn muốn đăng bán hoặc cho thuê bất động sản?",
+    "description": "Tiếp cận khách hàng tiềm năng và kết nối mạng lưới môi giới uy tín nhanh chóng qua hệ thống kiểm duyệt và chia sẻ MLS minh bạch.",
+    "button": "Đăng ký tài khoản ngay"
+  },
+  "LoginPage": {
+    "brandSubtitle": "Hệ thống thông tin",
+    "demoBadge": "Dữ liệu minh họa",
+    "backToHome": "Quay lại Trang chủ",
+    "heroImageAlt": "Không gian nội thất căn hộ hiện đại tràn ngập ánh sáng tự nhiên",
+    "verifiedEnvironment": "Môi trường giao dịch an tâm & minh bạch",
+    "portalBadge": "Cổng quản lý Batdongsan",
+    "welcomeTitle": "Chào mừng bạn trở lại",
+    "welcomeSubtitle": "Đăng nhập để quản lý tin đăng và tiếp tục hành trình tìm kiếm bất động sản.",
+    "features": {
+      "manage": {
+        "title": "Quản lý tin đăng của bạn",
+        "description": "Dễ dàng đăng mới, theo dõi trạng thái kiểm duyệt và hiệu suất tin đăng."
+      },
+      "saved": {
+        "title": "Theo dõi bất động sản đã lưu",
+        "description": "Cập nhật biến động giá và thông báo tin đăng phù hợp kịp thời."
+      },
+      "contacts": {
+        "title": "Nhận & quản lý yêu cầu liên hệ",
+        "description": "Kết nối với khách hàng tiềm năng an tâm và bảo mật theo phân quyền tài khoản."
+      }
+    },
+    "academicNote": "Nền tảng học thuật phục vụ đồ án công nghệ thông tin.",
+    "formTitle": "Đăng nhập",
+    "formSubtitle": "Nhập thông tin tài khoản để tiếp tục truy cập hệ thống.",
+    "emailLabel": "Email",
+    "emailPlaceholder": "Nhập địa chỉ email của bạn",
+    "passwordLabel": "Mật khẩu",
+    "passwordPlaceholder": "Nhập mật khẩu",
+    "showPassword": "Hiện mật khẩu",
+    "hidePassword": "Ẩn mật khẩu",
+    "rememberMe": "Ghi nhớ đăng nhập",
+    "forgotPassword": "Quên mật khẩu?",
+    "sessionValidityNote": "* Phiên đăng nhập hiện có hiệu lực tối đa 15 phút. Ghi nhớ đăng nhập dài hạn sẽ được hỗ trợ khi hệ thống bổ sung cơ chế gia hạn phiên.",
+    "submitIdle": "Đăng nhập",
+    "submitLoading": "Đang xác thực...",
+    "noAccountPrompt": "Chưa có tài khoản? ",
+    "registerNow": "Đăng ký ngay",
+    "termsPrefix": "Bằng việc đăng nhập, bạn đồng ý với",
+    "termsOfService": "Điều khoản dịch vụ",
+    "termsAnd": "và",
+    "privacyPolicy": "Chính sách bảo mật",
+    "termsSuffix": "của Batdongsan.",
+    "footerCopyright": "© 2026 Batdongsan. Nền tảng học thuật phục vụ đồ án công nghệ thông tin.",
+    "operatingRules": "Quy chế hoạt động",
+    "errors": {
+      "emptyFields": "Vui lòng nhập đầy đủ email và mật khẩu",
+      "invalidCredentials": "Email hoặc mật khẩu không chính xác",
+      "loginFailed": "Đăng nhập thất bại. Vui lòng thử lại.",
+      "networkError": "Không thể kết nối đến máy chủ. Vui lòng kiểm tra lại."
+    },
+    "forgotModal": {
+      "title": "Khôi phục mật khẩu",
+      "closeAriaLabel": "Đóng",
+      "roadmapTitle": "Tính năng đang trong lộ trình phát triển",
+      "roadmapDescription": "Chức năng gửi email đặt lại mật khẩu (GAP-03) hiện chưa được hỗ trợ tại API backend. Vui lòng sử dụng tài khoản mẫu hoặc liên hệ quản trị viên để được hỗ trợ.",
+      "acknowledgeButton": "Đã hiểu"
+    }
+  },
+  "RegisterPage": {
+    "brandSubtitle": "HỆ THỐNG THÔNG TIN BẤT ĐỘNG SẢN",
+    "backToHome": "Về trang chủ",
+    "heroImageAlt": "Căn hộ cao cấp tràn ngập ánh sáng tự nhiên với phòng khách tinh tế nhìn ra không gian xanh",
+    "verifiedEnvironment": "Môi trường giao dịch an tâm & minh bạch",
+    "welcomeTitle": "Bắt đầu hành trình cùng Batdongsan",
+    "welcomeSubtitle": "Nền tảng hỗ trợ kết nối, tra cứu thông tin bất động sản minh bạch và quản lý nhu cầu giao dịch hiệu quả.",
+    "features": {
+      "search": {
+        "title": "Tìm kiếm bất động sản",
+        "description": "Tra cứu hàng ngàn tin đăng nhà đất, căn hộ với thông tin minh bạch."
+      },
+      "save": {
+        "title": "Lưu tin và theo dõi",
+        "description": "Cập nhật biến động giá và nhận thông báo về bất động sản quan tâm."
+      },
+      "manage": {
+        "title": "Quản lý tin đăng và liên hệ",
+        "description": "Đăng tin và tiếp nhận yêu cầu liên hệ phù hợp theo quyền tài khoản."
+      }
+    },
+    "securityNote": "Bảo mật thông tin & mã hóa dữ liệu theo tiêu chuẩn hệ thống.",
+    "formTitle": "Tạo tài khoản",
+    "formSubtitle": "Điền thông tin để bắt đầu sử dụng Batdongsan.",
+    "fullNameLabel": "Họ và tên",
+    "fullNamePlaceholder": "Nguyễn Văn A",
+    "emailLabel": "Email",
+    "emailPlaceholder": "name@example.com",
+    "phoneLabel": "Số điện thoại",
+    "phoneOptional": "(không bắt buộc)",
+    "phonePlaceholder": "Nhập số điện thoại liên hệ",
+    "phoneNote": "* Thông tin số điện thoại chưa được lưu ở giai đoạn này. Bạn có thể cập nhật sau khi tính năng quản lý hồ sơ cá nhân được triển khai.",
+    "passwordLabel": "Mật khẩu",
+    "passwordPlaceholder": "Tối thiểu 8 ký tự",
+    "showPassword": "Hiện mật khẩu",
+    "hidePassword": "Ẩn mật khẩu",
+    "confirmPasswordLabel": "Xác nhận mật khẩu",
+    "confirmPasswordPlaceholder": "Nhập lại mật khẩu",
+    "showConfirmPassword": "Hiện xác nhận mật khẩu",
+    "hideConfirmPassword": "Ẩn xác nhận mật khẩu",
+    "usagePurposeLabel": "Mục đích sử dụng chính",
+    "usageOptions": {
+      "BUYER": {
+        "title": "Tìm mua hoặc thuê",
+        "description": "Tìm kiếm, lưu tin và gửi yêu cầu liên hệ."
+      },
+      "OWNER": {
+        "title": "Đăng tin bất động sản",
+        "description": "Quản lý tin đăng của bất động sản bạn có quyền đăng."
+      },
+      "AGENT": {
+        "title": "Hoạt động môi giới",
+        "description": "Sử dụng công cụ quản lý khách hàng và tin đăng môi giới."
+      }
+    },
+    "roleNotePrefix": "Lưu ý:",
+    "roleNoteBody": "Đây chỉ là lựa chọn nhu cầu sử dụng ban đầu. Quyền hạn tài khoản thực tế (chủ nhà, môi giới) sẽ được xác thực và phân quyền qua quy trình quản trị của hệ thống.",
+    "termsPrefix": "Tôi đồng ý với",
+    "termsOfUse": "Điều khoản sử dụng",
+    "termsAnd": "và",
+    "privacyPolicy": "Chính sách quyền riêng tư",
+    "termsSuffix": "của Batdongsan.",
+    "submitIdle": "Tạo tài khoản",
+    "submitLoading": "Đang xử lý...",
+    "hasAccountPrompt": "Đã có tài khoản?",
+    "signInLink": "Đăng nhập",
+    "footerCopyright": "© 2026 Batdongsan. Nền tảng hỗ trợ tìm kiếm, đăng tin và quản lý thông tin bất động sản.",
+    "operatingRules": "Quy chế hoạt động",
+    "footerPrivacy": "Chính sách bảo mật",
+    "footerTerms": "Điều khoản dịch vụ",
+    "successMessage": "Đăng ký tài khoản thành công! Đang chuyển hướng sang trang Đăng nhập...",
+    "errors": {
+      "missingFullName": "Vui lòng nhập họ và tên",
+      "missingEmail": "Vui lòng nhập địa chỉ email",
+      "shortPassword": "Mật khẩu phải có độ dài tối thiểu 8 ký tự",
+      "passwordMismatch": "Mật khẩu và xác nhận mật khẩu không khớp",
+      "missingTerms": "Vui lòng đồng ý với Điều khoản sử dụng và Chính sách quyền riêng tư",
+      "emailConflict": "Địa chỉ email này đã được đăng ký. Vui lòng sử dụng email khác hoặc đăng nhập.",
+      "registerFailed": "Đăng ký tài khoản thất bại. Vui lòng kiểm tra lại thông tin.",
+      "networkError": "Không thể kết nối đến máy chủ. Vui lòng thử lại sau."
+    }
+  }
+}

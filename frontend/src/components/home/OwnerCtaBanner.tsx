@@ -1,7 +1,13 @@
+'use client';
+
 import React from 'react';
 import Link from 'next/link';
+import { useDictionary, useLocalizedHref } from '@/i18n';
 
 export function OwnerCtaBanner() {
+  const dict = useDictionary();
+  const localizeHref = useLocalizedHref();
+
   return (
     <section
       aria-labelledby="owner-cta-heading"
@@ -14,29 +20,28 @@ export function OwnerCtaBanner() {
               <span className="material-symbols-outlined text-sm">
                 campaign
               </span>
-              <span>Dành riêng cho chủ nhà &amp; môi giới</span>
+              <span>{dict.OwnerCta.badge}</span>
             </div>
             <h2
               id="owner-cta-heading"
               className="text-2xl lg:text-3xl font-bold text-[#142B4A] mb-2"
             >
-              Bạn muốn đăng bán hoặc cho thuê bất động sản?
+              {dict.OwnerCta.heading}
             </h2>
             <p className="text-sm lg:text-base text-[#475569] leading-relaxed">
-              Tiếp cận khách hàng tiềm năng và kết nối mạng lưới môi giới uy tín
-              nhanh chóng qua hệ thống kiểm duyệt và chia sẻ MLS minh bạch.
+              {dict.OwnerCta.description}
             </p>
           </div>
 
           <div className="flex flex-wrap items-center gap-3 flex-shrink-0">
             <Link
-              href="/register"
+              href={localizeHref('/register')}
               className="bg-[#0F766E] hover:bg-[#0D655E] text-white font-semibold text-sm lg:text-base px-6 py-3 rounded-lg transition-all duration-150 active:scale-95 shadow-sm inline-flex items-center gap-2"
             >
               <span className="material-symbols-outlined text-xl">
                 person_add
               </span>
-              <span>Đăng ký tài khoản ngay</span>
+              <span>{dict.OwnerCta.button}</span>
             </Link>
           </div>
         </div>

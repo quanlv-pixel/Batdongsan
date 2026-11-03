@@ -4,64 +4,69 @@ import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { PropertyType, TransactionType } from '@/types';
 import { buildListingsSearchParams } from '@/lib/formatters';
+import { useDictionary, useLocalizedHref } from '@/i18n';
 
-interface PricePreset {
-  label: string;
+interface PricePresetValue {
   minPrice: string;
   maxPrice: string;
 }
 
-interface AreaPreset {
-  label: string;
+interface AreaPresetValue {
   minArea: string;
   maxArea: string;
 }
 
-const SALE_PRICE_PRESETS: Record<string, PricePreset> = {
-  'under-2b': { label: 'Dưới 2 tỷ', minPrice: '', maxPrice: '2000000000' },
+const SALE_PRICE_PRESETS: Record<
+  'under-2b' | '2b-3b' | '3b-5b' | '5b-10b' | 'above-10b',
+  PricePresetValue
+> = {
+  'under-2b': { minPrice: '', maxPrice: '2000000000' },
   '2b-3b': {
-    label: '2 - 3 tỷ',
     minPrice: '2000000000',
     maxPrice: '3000000000',
   },
   '3b-5b': {
-    label: '3 - 5 tỷ',
     minPrice: '3000000000',
     maxPrice: '5000000000',
   },
   '5b-10b': {
-    label: '5 - 10 tỷ',
     minPrice: '5000000000',
     maxPrice: '10000000000',
   },
-  'above-10b': { label: 'Trên 10 tỷ', minPrice: '10000000000', maxPrice: '' },
+  'above-10b': { minPrice: '10000000000', maxPrice: '' },
 };
 
-const RENT_PRICE_PRESETS: Record<string, PricePreset> = {
-  'under-10m': { label: 'Dưới 10 triệu', minPrice: '', maxPrice: '10000000' },
+const RENT_PRICE_PRESETS: Record<
+  'under-10m' | '10m-20m' | '20m-50m' | 'above-50m',
+  PricePresetValue
+> = {
+  'under-10m': { minPrice: '', maxPrice: '10000000' },
   '10m-20m': {
-    label: '10 - 20 triệu',
     minPrice: '10000000',
     maxPrice: '20000000',
   },
   '20m-50m': {
-    label: '20 - 50 triệu',
     minPrice: '20000000',
     maxPrice: '50000000',
   },
-  'above-50m': { label: 'Trên 50 triệu', minPrice: '50000000', maxPrice: '' },
+  'above-50m': { minPrice: '50000000', maxPrice: '' },
 };
 
-const AREA_PRESETS: Record<string, AreaPreset> = {
-  'under-50': { label: 'Dưới 50 m²', minArea: '', maxArea: '50' },
-  '50-80': { label: '50 - 80 m²', minArea: '50', maxArea: '80' },
-  '80-120': { label: '80 - 120 m²', minArea: '80', maxArea: '120' },
-  '120-200': { label: '120 - 200 m²', minArea: '120', maxArea: '200' },
-  'above-200': { label: 'Trên 200 m²', minArea: '200', maxArea: '' },
+const AREA_PRESETS: Record<
+  'under-50' | '50-80' | '80-120' | '120-200' | 'above-200',
+  AreaPresetValue
+> = {
+  'under-50': { minArea: '', maxArea: '50' },
+  '50-80': { minArea: '50', maxArea: '80' },
+  '80-120': { minArea: '80', maxArea: '120' },
+  '120-200': { minArea: '120', maxArea: '200' },
+  'above-200': { minArea: '200', maxArea: '' },
 };
 
 export function HeroSearchBox() {
   const router = useRouter();
+  const dict = useDictionary();
+  const localizeHref = useLocalizedHref();
 
   const [transactionType, setTransactionType] =
     useState<TransactionType>('FOR_SALE');
@@ -75,8 +80,13 @@ export function HeroSearchBox() {
   const [minArea, setMinArea] = useState<string>('');
   const [maxArea, setMaxArea] = useState<string>('');
 
-  const activePricePresets =
+  const activePricePresets: Record<string, PricePresetValue> =
     transactionType === 'FOR_RENT' ? RENT_PRICE_PRESETS : SALE_PRICE_PRESETS;
+
+  const activePricePresetLabels: Record<string, string> =
+    transactionType === 'FOR_RENT'
+      ? dict.HeroSearch.rentPricePresets
+      : dict.HeroSearch.salePricePresets;
 
   const handleTabChange = (nextTxType: TransactionType) => {
     setTransactionType(nextTxType);
@@ -106,7 +116,7 @@ export function HeroSearchBox() {
       setMaxArea('');
       return;
     }
-    const preset = AREA_PRESETS[presetKey];
+    const preset = AREA_PRESETS[presetKey as keyof typeof AREA_PRESETS];
     if (preset) {
       setMinArea(preset.minArea);
       setMaxArea(preset.maxArea);
@@ -137,7 +147,8 @@ export function HeroSearchBox() {
     });
 
     const queryString = searchParams.toString();
-    router.push(`/bat-dong-san${queryString ? `?${queryString}` : ''}`);
+    const targetPath = `/bat-dong-san${queryString ? `?${queryString}` : ''}`;
+    router.push(localizeHref(targetPath));
   };
 
   return (
@@ -146,10 +157,10 @@ export function HeroSearchBox() {
         {/* Headline & Subtitle */}
         <div className="text-center max-w-3xl mx-auto mb-8 lg:mb-10">
           <h1 className="text-3xl sm:text-4xl lg:text-[42px] font-bold text-[#142B4A] leading-tight tracking-tight mb-3">
-            Tìm bất động sản phù hợp với bạn
+            {dict.HeroSearch.title}
           </h1>
           <p className="text-base lg:text-lg text-[#475569] max-w-2xl mx-auto">
-            Khám phá nơi ở lý tưởng và cơ hội đầu tư phù hợp với nhu cầu của bạn.
+            {dict.HeroSearch.subtitle}
           </p>
         </div>
 
@@ -158,7 +169,7 @@ export function HeroSearchBox() {
           {/* 3 Classification Tabs */}
           <div
             role="tablist"
-            aria-label="Hình thức giao dịch"
+            aria-label={dict.HeroSearch.tablistAriaLabel}
             className="flex flex-wrap items-center gap-2 border-b border-[#E2E8F0] pb-4 mb-5"
           >
             <button
@@ -173,7 +184,7 @@ export function HeroSearchBox() {
               }`}
             >
               <span className="material-symbols-outlined text-lg">sell</span>
-              <span>Mua bán</span>
+              <span>{dict.HeroSearch.tabSale}</span>
             </button>
 
             <button
@@ -188,7 +199,7 @@ export function HeroSearchBox() {
               }`}
             >
               <span className="material-symbols-outlined text-lg">key</span>
-              <span>Cho thuê</span>
+              <span>{dict.HeroSearch.tabRent}</span>
             </button>
 
             <button
@@ -197,15 +208,15 @@ export function HeroSearchBox() {
               disabled
               aria-disabled="true"
               aria-selected={false}
-              title="Mô-đun Dự án đang phát triển"
+              title={dict.HeroSearch.projectTooltip}
               className="px-4 py-2 rounded-lg text-sm font-medium text-[#94A3B8] bg-slate-50 border border-slate-200 cursor-not-allowed flex items-center gap-2"
             >
               <span className="material-symbols-outlined text-lg">
                 apartment
               </span>
-              <span>Dự án</span>
+              <span>{dict.HeroSearch.tabProject}</span>
               <span className="text-[10px] font-semibold uppercase px-1.5 py-0.5 rounded bg-slate-200 text-[#475569]">
-                Sắp ra mắt
+                {dict.HeroSearch.comingSoon}
               </span>
             </button>
           </div>
@@ -220,7 +231,7 @@ export function HeroSearchBox() {
                   htmlFor="hero-province"
                   className="block text-xs font-medium text-[#475569] mb-1"
                 >
-                  Tỉnh / Thành phố
+                  {dict.HeroSearch.provinceLabel}
                 </label>
                 <div className="relative flex items-center">
                   <span className="material-symbols-outlined text-[#64748B] absolute left-2.5 text-base pointer-events-none">
@@ -232,7 +243,7 @@ export function HeroSearchBox() {
                     type="text"
                     value={province}
                     onChange={(e) => setProvince(e.target.value)}
-                    placeholder="VD: TP. Hồ Chí Minh"
+                    placeholder={dict.HeroSearch.provincePlaceholder}
                     autoComplete="off"
                     className="w-full pl-8 pr-2.5 py-2.5 text-xs bg-[#F8FAFC] text-[#142B4A] border border-[#CBD5E1] rounded-lg focus:outline-none focus:border-[#0F766E] focus:ring-1 focus:ring-[#0F766E] transition-all"
                   />
@@ -245,7 +256,7 @@ export function HeroSearchBox() {
                   htmlFor="hero-district"
                   className="block text-xs font-medium text-[#475569] mb-1"
                 >
-                  Quận / Huyện
+                  {dict.HeroSearch.districtLabel}
                 </label>
                 <div className="relative flex items-center">
                   <span className="material-symbols-outlined text-[#64748B] absolute left-2.5 text-base pointer-events-none">
@@ -257,7 +268,7 @@ export function HeroSearchBox() {
                     type="text"
                     value={district}
                     onChange={(e) => setDistrict(e.target.value)}
-                    placeholder="VD: Quận 1"
+                    placeholder={dict.HeroSearch.districtPlaceholder}
                     autoComplete="off"
                     className="w-full pl-8 pr-2.5 py-2.5 text-xs bg-[#F8FAFC] text-[#142B4A] border border-[#CBD5E1] rounded-lg focus:outline-none focus:border-[#0F766E] focus:ring-1 focus:ring-[#0F766E] transition-all"
                   />
@@ -270,7 +281,7 @@ export function HeroSearchBox() {
                   htmlFor="hero-property-type"
                   className="block text-xs font-medium text-[#475569] mb-1"
                 >
-                  Loại bất động sản
+                  {dict.HeroSearch.propertyTypeLabel}
                 </label>
                 <div className="relative flex items-center">
                   <span className="material-symbols-outlined text-[#64748B] absolute left-2.5 text-base pointer-events-none">
@@ -285,13 +296,25 @@ export function HeroSearchBox() {
                     }
                     className="w-full pl-8 pr-6 py-2.5 text-xs bg-[#F8FAFC] text-[#142B4A] border border-[#CBD5E1] rounded-lg focus:outline-none focus:border-[#0F766E] focus:ring-1 focus:ring-[#0F766E] appearance-none transition-all cursor-pointer"
                   >
-                    <option value="">Tất cả loại BĐS</option>
-                    <option value="APARTMENT">Căn hộ chung cư</option>
-                    <option value="HOUSE">Nhà ở / Nhà phố</option>
-                    <option value="VILLA">Biệt thự</option>
-                    <option value="LAND">Đất nền</option>
-                    <option value="COMMERCIAL">Thương mại / Văn phòng</option>
-                    <option value="OTHER">Bất động sản khác</option>
+                    <option value="">{dict.HeroSearch.propertyTypeAll}</option>
+                    <option value="APARTMENT">
+                      {dict.HeroSearch.propertyTypes.APARTMENT}
+                    </option>
+                    <option value="HOUSE">
+                      {dict.HeroSearch.propertyTypes.HOUSE}
+                    </option>
+                    <option value="VILLA">
+                      {dict.HeroSearch.propertyTypes.VILLA}
+                    </option>
+                    <option value="LAND">
+                      {dict.HeroSearch.propertyTypes.LAND}
+                    </option>
+                    <option value="COMMERCIAL">
+                      {dict.HeroSearch.propertyTypes.COMMERCIAL}
+                    </option>
+                    <option value="OTHER">
+                      {dict.HeroSearch.propertyTypes.OTHER}
+                    </option>
                   </select>
                   <span className="material-symbols-outlined text-[#64748B] absolute right-1.5 text-base pointer-events-none">
                     expand_more
@@ -305,7 +328,7 @@ export function HeroSearchBox() {
                   htmlFor="hero-price-preset"
                   className="block text-xs font-medium text-[#475569] mb-1"
                 >
-                  Khoảng giá
+                  {dict.HeroSearch.priceRangeLabel}
                 </label>
                 <div className="relative flex items-center">
                   <span className="material-symbols-outlined text-[#64748B] absolute left-2.5 text-base pointer-events-none">
@@ -317,10 +340,10 @@ export function HeroSearchBox() {
                     onChange={(e) => handlePricePresetChange(e.target.value)}
                     className="w-full pl-8 pr-6 py-2.5 text-xs bg-[#F8FAFC] text-[#142B4A] border border-[#CBD5E1] rounded-lg focus:outline-none focus:border-[#0F766E] focus:ring-1 focus:ring-[#0F766E] appearance-none transition-all cursor-pointer"
                   >
-                    <option value="">Mức giá (VNĐ)</option>
-                    {Object.entries(activePricePresets).map(([key, item]) => (
+                    <option value="">{dict.HeroSearch.pricePlaceholder}</option>
+                    {Object.keys(activePricePresets).map((key) => (
                       <option key={key} value={key}>
-                        {item.label}
+                        {activePricePresetLabels[key]}
                       </option>
                     ))}
                   </select>
@@ -336,7 +359,7 @@ export function HeroSearchBox() {
                   htmlFor="hero-area-preset"
                   className="block text-xs font-medium text-[#475569] mb-1"
                 >
-                  Diện tích
+                  {dict.HeroSearch.areaLabel}
                 </label>
                 <div className="relative flex items-center">
                   <span className="material-symbols-outlined text-[#64748B] absolute left-2.5 text-base pointer-events-none">
@@ -348,10 +371,14 @@ export function HeroSearchBox() {
                     onChange={(e) => handleAreaPresetChange(e.target.value)}
                     className="w-full pl-8 pr-6 py-2.5 text-xs bg-[#F8FAFC] text-[#142B4A] border border-[#CBD5E1] rounded-lg focus:outline-none focus:border-[#0F766E] focus:ring-1 focus:ring-[#0F766E] appearance-none transition-all cursor-pointer"
                   >
-                    <option value="">Diện tích (m²)</option>
-                    {Object.entries(AREA_PRESETS).map(([key, item]) => (
+                    <option value="">{dict.HeroSearch.areaPlaceholder}</option>
+                    {(
+                      Object.keys(AREA_PRESETS) as Array<
+                        keyof typeof AREA_PRESETS
+                      >
+                    ).map((key) => (
                       <option key={key} value={key}>
-                        {item.label}
+                        {dict.HeroSearch.areaPresets[key]}
                       </option>
                     ))}
                   </select>
@@ -370,7 +397,7 @@ export function HeroSearchBox() {
                   <span className="material-symbols-outlined text-lg">
                     search
                   </span>
-                  <span>Tìm kiếm</span>
+                  <span>{dict.HeroSearch.searchButton}</span>
                 </button>
               </div>
             </div>
@@ -382,7 +409,7 @@ export function HeroSearchBox() {
                   htmlFor="hero-min-price"
                   className="block text-[11px] font-medium text-[#64748B] mb-1"
                 >
-                  Giá tối thiểu (VNĐ)
+                  {dict.HeroSearch.minPriceLabel}
                 </label>
                 <input
                   id="hero-min-price"
@@ -394,7 +421,7 @@ export function HeroSearchBox() {
                     setPricePreset('');
                     setMinPrice(e.target.value);
                   }}
-                  placeholder="VD: 2000000000"
+                  placeholder={dict.HeroSearch.minPricePlaceholder}
                   className="w-full px-3 py-1.5 text-xs bg-[#F8FAFC] text-[#142B4A] border border-[#CBD5E1] rounded-lg focus:outline-none focus:border-[#0F766E]"
                 />
               </div>
@@ -404,7 +431,7 @@ export function HeroSearchBox() {
                   htmlFor="hero-max-price"
                   className="block text-[11px] font-medium text-[#64748B] mb-1"
                 >
-                  Giá tối đa (VNĐ)
+                  {dict.HeroSearch.maxPriceLabel}
                 </label>
                 <input
                   id="hero-max-price"
@@ -416,7 +443,7 @@ export function HeroSearchBox() {
                     setPricePreset('');
                     setMaxPrice(e.target.value);
                   }}
-                  placeholder="VD: 5000000000"
+                  placeholder={dict.HeroSearch.maxPricePlaceholder}
                   className="w-full px-3 py-1.5 text-xs bg-[#F8FAFC] text-[#142B4A] border border-[#CBD5E1] rounded-lg focus:outline-none focus:border-[#0F766E]"
                 />
               </div>
@@ -426,7 +453,7 @@ export function HeroSearchBox() {
                   htmlFor="hero-min-area"
                   className="block text-[11px] font-medium text-[#64748B] mb-1"
                 >
-                  Diện tích tối thiểu (m²)
+                  {dict.HeroSearch.minAreaLabel}
                 </label>
                 <input
                   id="hero-min-area"
@@ -438,7 +465,7 @@ export function HeroSearchBox() {
                     setAreaPreset('');
                     setMinArea(e.target.value);
                   }}
-                  placeholder="VD: 50"
+                  placeholder={dict.HeroSearch.minAreaPlaceholder}
                   className="w-full px-3 py-1.5 text-xs bg-[#F8FAFC] text-[#142B4A] border border-[#CBD5E1] rounded-lg focus:outline-none focus:border-[#0F766E]"
                 />
               </div>
@@ -448,7 +475,7 @@ export function HeroSearchBox() {
                   htmlFor="hero-max-area"
                   className="block text-[11px] font-medium text-[#64748B] mb-1"
                 >
-                  Diện tích tối đa (m²)
+                  {dict.HeroSearch.maxAreaLabel}
                 </label>
                 <input
                   id="hero-max-area"
@@ -460,7 +487,7 @@ export function HeroSearchBox() {
                     setAreaPreset('');
                     setMaxArea(e.target.value);
                   }}
-                  placeholder="VD: 120"
+                  placeholder={dict.HeroSearch.maxAreaPlaceholder}
                   className="w-full px-3 py-1.5 text-xs bg-[#F8FAFC] text-[#142B4A] border border-[#CBD5E1] rounded-lg focus:outline-none focus:border-[#0F766E]"
                 />
               </div>

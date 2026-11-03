@@ -1,7 +1,7 @@
 import React from 'react';
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 import { render, screen, fireEvent, waitFor, act } from '@testing-library/react';
-import RegisterPage from '@/app/register/page';
+import RegisterPage from '@/app/[locale]/register/page';
 import * as AuthContextModule from '@/context/AuthContext';
 import { ApiClientError } from '@/lib/api-client';
 

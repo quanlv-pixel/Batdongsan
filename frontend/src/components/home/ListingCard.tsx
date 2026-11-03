@@ -13,6 +13,7 @@ import {
   getPropertyTypeLabel,
   getTransactionBadgeLabel,
 } from '@/lib/formatters';
+import { useAppLocale, useDictionary, useLocalizedHref } from '@/i18n';
 
 interface ListingCardProps {
   listing: PublicListingSummary;
@@ -21,6 +22,9 @@ interface ListingCardProps {
 
 export function ListingCard({ listing, priority = false }: ListingCardProps) {
   const [imageError, setImageError] = useState(false);
+  const locale = useAppLocale();
+  const dict = useDictionary();
+  const localizeHref = useLocalizedHref();
 
   const sortedImages = Array.isArray(listing.images)
     ? [...listing.images].sort((a, b) => (a.order ?? 0) - (b.order ?? 0))
@@ -31,24 +35,31 @@ export function ListingCard({ listing, priority = false }: ListingCardProps) {
   const formattedPrice = formatVndPrice(listing.priceVnd, {
     transactionType: listing.transactionType,
     rentalPeriod: listing.rentalPeriod,
+    locale,
   });
   const formattedPricePerSqm = formatPricePerSqm(
     listing.priceVnd,
     listing.areaSqm,
     listing.transactionType,
+    locale,
   );
-  const formattedArea = formatArea(listing.areaSqm);
-  const propertyTypeLabel = getPropertyTypeLabel(listing.propertyType);
+  const formattedArea = formatArea(listing.areaSqm, locale);
+  const propertyTypeLabel = getPropertyTypeLabel(listing.propertyType, locale);
   const transactionBadge = getTransactionBadgeLabel(
     listing.transactionType,
     listing.propertyType,
+    locale,
   );
   const locationText = formatAdministrativeLocation({
     ward: listing.ward,
     district: listing.district,
     province: listing.province,
   });
-  const formattedDate = formatListingDate(listing.createdAt);
+  const formattedDate = formatListingDate(listing.createdAt, locale);
+  const photosBadgeText = dict.LatestListings.photosCount.replace(
+    '{count}',
+    String(sortedImages.length),
+  );
 
   return (
     <article className="bg-white rounded-lg border border-[#E2E8F0] overflow-hidden shadow-sm hover:shadow-lg transition-all duration-200 group flex flex-col">
@@ -73,7 +84,9 @@ export function ListingCard({ listing, priority = false }: ListingCardProps) {
             <span className="material-symbols-outlined text-4xl text-[#94A3B8]">
               image_not_supported
             </span>
-            <span className="text-xs font-medium">Chưa có hình ảnh</span>
+            <span className="text-xs font-medium">
+              {dict.LatestListings.noImage}
+            </span>
           </div>
         )}
 
@@ -89,7 +102,7 @@ export function ListingCard({ listing, priority = false }: ListingCardProps) {
             <span className="material-symbols-outlined text-xs">
               photo_camera
             </span>
-            <span>{sortedImages.length} ảnh</span>
+            <span>{photosBadgeText}</span>
           </div>
         )}
       </div>
@@ -110,7 +123,9 @@ export function ListingCard({ listing, priority = false }: ListingCardProps) {
 
         {/* Title linking to detail route */}
         <h3 className="text-base font-semibold text-[#142B4A] line-clamp-2 group-hover:text-[#0F766E] transition-colors mb-3 leading-snug">
-          <Link href={`/bat-dong-san/${listing.id}`}>{listing.title}</Link>
+          <Link href={localizeHref(`/bat-dong-san/${listing.id}`)}>
+            {listing.title}
+          </Link>
         </h3>
 
         {/* Verified Specifications Only (Area & Property Type — no fabricated bedrooms/bathrooms) */}
