@@ -81,3 +81,58 @@ export interface ApiError {
   message: string | string[];
   error?: string;
 }
+
+export interface ListingImage {
+  id: string;
+  url: string;
+  order: number;
+}
+
+/**
+ * Public listing item returned by GET /api/listings.
+ * Matches strict select projection in Backend ListingsService.getPublicListings.
+ * Private fields (streetAddress, latitude, longitude, ownerId, owner PII) are excluded.
+ */
+export interface PublicListingSummary {
+  id: string;
+  title: string;
+  description: string;
+  propertyType: PropertyType;
+  transactionType: TransactionType;
+  priceVnd: string;
+  rentalPeriod: RentalPeriod | null;
+  areaSqm: number;
+  province: string;
+  district: string;
+  ward: string | null;
+  status: ListingStatus;
+  createdAt: string;
+  updatedAt: string;
+  images: ListingImage[];
+}
+
+export interface PaginationMeta {
+  total: number;
+  page: number;
+  limit: number;
+  totalPages: number;
+}
+
+export interface PublicListingsResponse {
+  data: PublicListingSummary[];
+  meta: PaginationMeta;
+}
+
+export interface PublicListingsQuery {
+  page?: number;
+  limit?: number;
+  province?: string;
+  district?: string;
+  ward?: string;
+  propertyType?: PropertyType;
+  transactionType?: TransactionType;
+  minPrice?: string;
+  maxPrice?: string;
+  minArea?: number;
+  maxArea?: number;
+}

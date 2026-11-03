@@ -65,12 +65,24 @@ export function Navbar() {
         </Link>
 
         {/* Center: Navigation Links */}
-        <nav className="hidden md:flex items-center gap-6">
+        <nav className="hidden md:flex items-center gap-7" aria-label="Điều hướng chính">
           <Link
             href="/"
-            className="text-sm font-medium text-[#475569] hover:text-[#0F766E] transition-colors"
+            className="text-sm font-medium text-[#142B4A] hover:text-[#0F766E] transition-colors"
           >
             Trang chủ
+          </Link>
+          <Link
+            href="/bat-dong-san?transactionType=FOR_SALE"
+            className="text-sm font-medium text-[#475569] hover:text-[#0F766E] transition-colors"
+          >
+            Mua bán
+          </Link>
+          <Link
+            href="/bat-dong-san?transactionType=FOR_RENT"
+            className="text-sm font-medium text-[#475569] hover:text-[#0F766E] transition-colors"
+          >
+            Cho thuê
           </Link>
         </nav>
 
@@ -136,9 +148,23 @@ export function Navbar() {
           <Link
             href="/"
             onClick={() => setIsMenuOpen(false)}
-            className="block text-sm font-medium text-[#475569] hover:text-[#0F766E] py-2"
+            className="block text-sm font-medium text-[#142B4A] hover:text-[#0F766E] py-2"
           >
             Trang chủ
+          </Link>
+          <Link
+            href="/bat-dong-san?transactionType=FOR_SALE"
+            onClick={() => setIsMenuOpen(false)}
+            className="block text-sm font-medium text-[#475569] hover:text-[#0F766E] py-2"
+          >
+            Mua bán
+          </Link>
+          <Link
+            href="/bat-dong-san?transactionType=FOR_RENT"
+            onClick={() => setIsMenuOpen(false)}
+            className="block text-sm font-medium text-[#475569] hover:text-[#0F766E] py-2"
+          >
+            Cho thuê
           </Link>
           {isAuthenticated && user ? (
             <div className="pt-2 border-t border-[#E2E8F0] space-y-2">

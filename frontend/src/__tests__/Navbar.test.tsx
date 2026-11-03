@@ -160,4 +160,54 @@ describe('Navbar Component Tests', () => {
 
     expect(mockLogout).toHaveBeenCalledTimes(1);
   });
+
+  it('7. Public navigation links: renders Trang chủ, Mua bán, and Cho thuê with valid hrefs', () => {
+    vi.spyOn(AuthContextModule, 'useAuth').mockReturnValue({
+      user: null,
+      isAuthenticated: false,
+      isLoading: false,
+      login: vi.fn(),
+      register: vi.fn(),
+      logout: vi.fn(),
+      refreshUser: vi.fn(),
+    });
+
+    render(<Navbar />);
+
+    const homeLink = screen.getByRole('link', { name: 'Trang chủ' });
+    const saleLink = screen.getByRole('link', { name: 'Mua bán' });
+    const rentLink = screen.getByRole('link', { name: 'Cho thuê' });
+
+    expect(homeLink.getAttribute('href')).toBe('/');
+    expect(saleLink.getAttribute('href')).toBe(
+      '/bat-dong-san?transactionType=FOR_SALE',
+    );
+    expect(rentLink.getAttribute('href')).toBe(
+      '/bat-dong-san?transactionType=FOR_RENT',
+    );
+  });
+
+  it('8. Route integrity: does not render dead links or unimplemented nav items', () => {
+    vi.spyOn(AuthContextModule, 'useAuth').mockReturnValue({
+      user: null,
+      isAuthenticated: false,
+      isLoading: false,
+      login: vi.fn(),
+      register: vi.fn(),
+      logout: vi.fn(),
+      refreshUser: vi.fn(),
+    });
+
+    const { container } = render(<Navbar />);
+    const anchors = Array.from(container.querySelectorAll('a'));
+
+    for (const anchor of anchors) {
+      const href = anchor.getAttribute('href');
+      expect(href).toBeTruthy();
+      expect(href).not.toBe('#');
+    }
+
+    expect(screen.queryByText('Dự án')).toBeNull();
+    expect(screen.queryByText('Tin tức')).toBeNull();
+  });
 });
