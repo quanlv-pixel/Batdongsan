@@ -16,21 +16,10 @@ import {
 
 interface ListingCardProps {
   listing: PublicListingSummary;
+  priority?: boolean;
 }
 
-function isVerifiedRemoteImageHost(url: string): boolean {
-  try {
-    const parsed = new URL(url);
-    return (
-      parsed.protocol === 'https:' &&
-      parsed.hostname === 'images.unsplash.com'
-    );
-  } catch {
-    return false;
-  }
-}
-
-export function ListingCard({ listing }: ListingCardProps) {
+export function ListingCard({ listing, priority = false }: ListingCardProps) {
   const [imageError, setImageError] = useState(false);
 
   const sortedImages = Array.isArray(listing.images)
@@ -71,7 +60,8 @@ export function ListingCard({ listing }: ListingCardProps) {
             alt={listing.title}
             fill
             sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-            unoptimized={!isVerifiedRemoteImageHost(primaryImageUrl)}
+            loading={priority ? 'eager' : 'lazy'}
+            unoptimized
             onError={() => setImageError(true)}
             className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
           />

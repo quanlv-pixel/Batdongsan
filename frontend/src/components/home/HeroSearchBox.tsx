@@ -154,7 +154,7 @@ export function HeroSearchBox() {
         </div>
 
         {/* Property Search Panel Card */}
-        <div className="max-w-5xl mx-auto bg-white rounded-xl shadow-sm border border-[#E2E8F0] p-5 lg:p-6">
+        <div className="max-w-6xl mx-auto bg-white rounded-xl shadow-sm border border-[#E2E8F0] p-5 lg:p-6">
           {/* 3 Classification Tabs */}
           <div
             role="tablist"
@@ -223,7 +223,7 @@ export function HeroSearchBox() {
                   Tỉnh / Thành phố
                 </label>
                 <div className="relative flex items-center">
-                  <span className="material-symbols-outlined text-[#64748B] absolute left-3 text-lg pointer-events-none">
+                  <span className="material-symbols-outlined text-[#64748B] absolute left-2.5 text-base pointer-events-none">
                     location_on
                   </span>
                   <input
@@ -234,7 +234,7 @@ export function HeroSearchBox() {
                     onChange={(e) => setProvince(e.target.value)}
                     placeholder="VD: TP. Hồ Chí Minh"
                     autoComplete="off"
-                    className="w-full pl-9 pr-3 py-2.5 text-xs lg:text-sm bg-[#F8FAFC] text-[#142B4A] border border-[#CBD5E1] rounded-lg focus:outline-none focus:border-[#0F766E] focus:ring-1 focus:ring-[#0F766E] transition-all"
+                    className="w-full pl-8 pr-2.5 py-2.5 text-xs bg-[#F8FAFC] text-[#142B4A] border border-[#CBD5E1] rounded-lg focus:outline-none focus:border-[#0F766E] focus:ring-1 focus:ring-[#0F766E] transition-all"
                   />
                 </div>
               </div>
@@ -248,7 +248,7 @@ export function HeroSearchBox() {
                   Quận / Huyện
                 </label>
                 <div className="relative flex items-center">
-                  <span className="material-symbols-outlined text-[#64748B] absolute left-3 text-lg pointer-events-none">
+                  <span className="material-symbols-outlined text-[#64748B] absolute left-2.5 text-base pointer-events-none">
                     map
                   </span>
                   <input
@@ -259,7 +259,7 @@ export function HeroSearchBox() {
                     onChange={(e) => setDistrict(e.target.value)}
                     placeholder="VD: Quận 1"
                     autoComplete="off"
-                    className="w-full pl-9 pr-3 py-2.5 text-xs lg:text-sm bg-[#F8FAFC] text-[#142B4A] border border-[#CBD5E1] rounded-lg focus:outline-none focus:border-[#0F766E] focus:ring-1 focus:ring-[#0F766E] transition-all"
+                    className="w-full pl-8 pr-2.5 py-2.5 text-xs bg-[#F8FAFC] text-[#142B4A] border border-[#CBD5E1] rounded-lg focus:outline-none focus:border-[#0F766E] focus:ring-1 focus:ring-[#0F766E] transition-all"
                   />
                 </div>
               </div>
@@ -273,7 +273,7 @@ export function HeroSearchBox() {
                   Loại bất động sản
                 </label>
                 <div className="relative flex items-center">
-                  <span className="material-symbols-outlined text-[#64748B] absolute left-3 text-lg pointer-events-none">
+                  <span className="material-symbols-outlined text-[#64748B] absolute left-2.5 text-base pointer-events-none">
                     home_work
                   </span>
                   <select
@@ -283,7 +283,7 @@ export function HeroSearchBox() {
                     onChange={(e) =>
                       setPropertyType(e.target.value as PropertyType | '')
                     }
-                    className="w-full pl-9 pr-7 py-2.5 text-xs lg:text-sm bg-[#F8FAFC] text-[#142B4A] border border-[#CBD5E1] rounded-lg focus:outline-none focus:border-[#0F766E] focus:ring-1 focus:ring-[#0F766E] appearance-none transition-all cursor-pointer"
+                    className="w-full pl-8 pr-6 py-2.5 text-xs bg-[#F8FAFC] text-[#142B4A] border border-[#CBD5E1] rounded-lg focus:outline-none focus:border-[#0F766E] focus:ring-1 focus:ring-[#0F766E] appearance-none transition-all cursor-pointer"
                   >
                     <option value="">Tất cả loại BĐS</option>
                     <option value="APARTMENT">Căn hộ chung cư</option>
@@ -293,7 +293,7 @@ export function HeroSearchBox() {
                     <option value="COMMERCIAL">Thương mại / Văn phòng</option>
                     <option value="OTHER">Bất động sản khác</option>
                   </select>
-                  <span className="material-symbols-outlined text-[#64748B] absolute right-2 text-base pointer-events-none">
+                  <span className="material-symbols-outlined text-[#64748B] absolute right-1.5 text-base pointer-events-none">
                     expand_more
                   </span>
                 </div>
@@ -308,14 +308,14 @@ export function HeroSearchBox() {
                   Khoảng giá
                 </label>
                 <div className="relative flex items-center">
-                  <span className="material-symbols-outlined text-[#64748B] absolute left-3 text-lg pointer-events-none">
+                  <span className="material-symbols-outlined text-[#64748B] absolute left-2.5 text-base pointer-events-none">
                     payments
                   </span>
                   <select
                     id="hero-price-preset"
                     value={pricePreset}
                     onChange={(e) => handlePricePresetChange(e.target.value)}
-                    className="w-full pl-9 pr-7 py-2.5 text-xs lg:text-sm bg-[#F8FAFC] text-[#142B4A] border border-[#CBD5E1] rounded-lg focus:outline-none focus:border-[#0F766E] focus:ring-1 focus:ring-[#0F766E] appearance-none transition-all cursor-pointer"
+                    className="w-full pl-8 pr-6 py-2.5 text-xs bg-[#F8FAFC] text-[#142B4A] border border-[#CBD5E1] rounded-lg focus:outline-none focus:border-[#0F766E] focus:ring-1 focus:ring-[#0F766E] appearance-none transition-all cursor-pointer"
                   >
                     <option value="">Mức giá (VNĐ)</option>
                     {Object.entries(activePricePresets).map(([key, item]) => (
@@ -324,7 +324,7 @@ export function HeroSearchBox() {
                       </option>
                     ))}
                   </select>
-                  <span className="material-symbols-outlined text-[#64748B] absolute right-2 text-base pointer-events-none">
+                  <span className="material-symbols-outlined text-[#64748B] absolute right-1.5 text-base pointer-events-none">
                     expand_more
                   </span>
                 </div>
@@ -339,14 +339,14 @@ export function HeroSearchBox() {
                   Diện tích
                 </label>
                 <div className="relative flex items-center">
-                  <span className="material-symbols-outlined text-[#64748B] absolute left-3 text-lg pointer-events-none">
+                  <span className="material-symbols-outlined text-[#64748B] absolute left-2.5 text-base pointer-events-none">
                     square_foot
                   </span>
                   <select
                     id="hero-area-preset"
                     value={areaPreset}
                     onChange={(e) => handleAreaPresetChange(e.target.value)}
-                    className="w-full pl-9 pr-7 py-2.5 text-xs lg:text-sm bg-[#F8FAFC] text-[#142B4A] border border-[#CBD5E1] rounded-lg focus:outline-none focus:border-[#0F766E] focus:ring-1 focus:ring-[#0F766E] appearance-none transition-all cursor-pointer"
+                    className="w-full pl-8 pr-6 py-2.5 text-xs bg-[#F8FAFC] text-[#142B4A] border border-[#CBD5E1] rounded-lg focus:outline-none focus:border-[#0F766E] focus:ring-1 focus:ring-[#0F766E] appearance-none transition-all cursor-pointer"
                   >
                     <option value="">Diện tích (m²)</option>
                     {Object.entries(AREA_PRESETS).map(([key, item]) => (
@@ -355,7 +355,7 @@ export function HeroSearchBox() {
                       </option>
                     ))}
                   </select>
-                  <span className="material-symbols-outlined text-[#64748B] absolute right-2 text-base pointer-events-none">
+                  <span className="material-symbols-outlined text-[#64748B] absolute right-1.5 text-base pointer-events-none">
                     expand_more
                   </span>
                 </div>

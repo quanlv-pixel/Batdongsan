@@ -116,4 +116,21 @@ describe('ListingCard Component Tests', () => {
     expect(screen.getByText('Thuê căn hộ')).toBeDefined();
     expect(screen.queryByText(/tr\/m²/)).toBeNull();
   });
+
+  it('5. Applies eager loading when priority is true and lazy loading by default', () => {
+    const { unmount } = render(
+      <ListingCard listing={mockApprovedSaleListing} priority={true} />,
+    );
+    const eagerImg = screen.getByRole('img', {
+      name: mockApprovedSaleListing.title,
+    });
+    expect(eagerImg.getAttribute('loading')).toBe('eager');
+    unmount();
+
+    render(<ListingCard listing={mockApprovedSaleListing} />);
+    const lazyImg = screen.getByRole('img', {
+      name: mockApprovedSaleListing.title,
+    });
+    expect(lazyImg.getAttribute('loading')).toBe('lazy');
+  });
 });
