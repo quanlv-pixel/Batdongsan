@@ -18,9 +18,14 @@ import { useAppLocale, useDictionary, useLocalizedHref } from '@/i18n';
 interface ListingCardProps {
   listing: PublicListingSummary;
   priority?: boolean;
+  variant?: 'grid' | 'horizontal';
 }
 
-export function ListingCard({ listing, priority = false }: ListingCardProps) {
+export function ListingCard({
+  listing,
+  priority = false,
+  variant = 'grid',
+}: ListingCardProps) {
   const [imageError, setImageError] = useState(false);
   const locale = useAppLocale();
   const dict = useDictionary();
@@ -62,9 +67,19 @@ export function ListingCard({ listing, priority = false }: ListingCardProps) {
   );
 
   return (
-    <article className="bg-white rounded-lg border border-[#E2E8F0] overflow-hidden shadow-sm hover:shadow-lg transition-all duration-200 group flex flex-col">
+    <article
+      className={`bg-white rounded-lg border border-[#E2E8F0] overflow-hidden shadow-sm hover:shadow-lg transition-all duration-200 group flex ${
+        variant === 'horizontal' ? 'flex-col sm:flex-row' : 'flex-col'
+      }`}
+    >
       {/* Media Region */}
-      <div className="relative w-full h-56 overflow-hidden bg-[#F1F5F9]">
+      <div
+        className={`relative overflow-hidden bg-[#F1F5F9] ${
+          variant === 'horizontal'
+            ? 'w-full sm:w-[280px] h-56 sm:h-auto sm:min-h-[210px] flex-shrink-0'
+            : 'w-full h-56'
+        }`}
+      >
         {hasValidImage ? (
           <Image
             src={primaryImageUrl}

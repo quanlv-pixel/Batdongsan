@@ -5,7 +5,9 @@
     "loginTitle": "Đăng nhập | Batdongsan",
     "loginDescription": "Đăng nhập vào nền tảng Batdongsan để quản lý tin đăng, theo dõi bất động sản và kết nối giao dịch minh bạch.",
     "registerTitle": "Đăng ký tài khoản | Batdongsan",
-    "registerDescription": "Tạo tài khoản Batdongsan dành cho người mua, chủ sở hữu bất động sản và môi giới chuyên nghiệp."
+    "registerDescription": "Tạo tài khoản Batdongsan dành cho người mua, chủ sở hữu bất động sản và môi giới chuyên nghiệp.",
+    "searchTitle": "Tìm kiếm Bất động sản | Batdongsan",
+    "searchDescription": "Tìm kiếm danh sách bất động sản mua bán và cho thuê đã được kiểm duyệt với bộ lọc minh bạch theo vị trí, loại hình, diện tích và mức giá."
   },
   "LanguageSwitcher": {
     "ariaLabel": "Chọn ngôn ngữ hiển thị",
@@ -318,6 +320,128 @@
       "emailConflict": "Địa chỉ email này đã được đăng ký. Vui lòng sử dụng email khác hoặc đăng nhập.",
       "registerFailed": "Đăng ký tài khoản thất bại. Vui lòng kiểm tra lại thông tin.",
       "networkError": "Không thể kết nối đến máy chủ. Vui lòng thử lại sau."
+    }
+  },
+  "SearchResults": {
+    "breadcrumb": {
+      "home": "Trang chủ",
+      "searchResults": "Kết quả tìm kiếm",
+      "forSale": "Mua bán bất động sản",
+      "forRent": "Cho thuê bất động sản"
+    },
+    "demoBadge": "Tin đăng đã kiểm duyệt",
+    "pageTitle": "Kết quả tìm kiếm bất động sản",
+    "quickBar": {
+      "locationLabel": "Khu vực",
+      "locationPlaceholder": "Chọn địa điểm hoặc tỉnh thành",
+      "propertyTypeLabel": "Loại BĐS",
+      "propertyTypeAll": "Tất cả loại BĐS",
+      "priceLabel": "Mức giá",
+      "priceAll": "Tất cả mức giá",
+      "areaLabel": "Diện tích",
+      "areaAll": "Tất cả diện tích",
+      "searchButton": "Tìm kiếm"
+    },
+    "filterSidebar": {
+      "heading": "Bộ lọc tìm kiếm",
+      "resetButton": "Đặt lại",
+      "applyButton": "Áp dụng bộ lọc",
+      "clearButton": "Xóa bộ lọc",
+      "location": {
+        "title": "Khu vực",
+        "provinceLabel": "Tỉnh / Thành phố",
+        "provincePlaceholder": "Tất cả tỉnh thành",
+        "districtLabel": "Quận / Huyện",
+        "districtPlaceholder": "Nhập quận / huyện",
+        "wardLabel": "Phường / Xã",
+        "wardPlaceholder": "Nhập phường / xã"
+      },
+      "transactionType": {
+        "title": "Hình thức giao dịch",
+        "all": "Tất cả",
+        "forSale": "Mua bán",
+        "forRent": "Cho thuê"
+      },
+      "propertyType": {
+        "title": "Loại bất động sản",
+        "all": "Tất cả loại BĐS",
+        "items": {
+          "APARTMENT": "Căn hộ chung cư",
+          "HOUSE": "Nhà riêng",
+          "LAND": "Đất nền",
+          "VILLA": "Biệt thự",
+          "COMMERCIAL": "Mặt bằng / VP",
+          "OTHER": "BĐS khác"
+        }
+      },
+      "price": {
+        "title": "Khoảng giá (VNĐ)",
+        "from": "Từ",
+        "to": "Đến",
+        "minPlaceholder": "Giá từ",
+        "maxPlaceholder": "Giá đến"
+      },
+      "area": {
+        "title": "Diện tích (m²)",
+        "from": "Từ",
+        "to": "Đến",
+        "minPlaceholder": "Từ m²",
+        "maxPlaceholder": "Đến m²"
+      },
+      "upcoming": {
+        "title": "Tính năng mở rộng (Sắp ra mắt)",
+        "bedrooms": "Số phòng ngủ",
+        "legalStatus": "Pháp lý",
+        "legalRedBook": "Sổ đỏ / Sổ hồng",
+        "legalContract": "Hợp đồng mua bán",
+        "notice": "Tiêu chí này thuộc lộ trình phát triển tiếp theo của hệ thống."
+      }
+    },
+    "results": {
+      "heading": "Bất động sản phù hợp",
+      "count": "{total} kết quả",
+      "sortBy": "Sắp xếp theo:",
+      "sortNewest": "Mới nhất (mặc định)",
+      "activeFiltersLabel": "Đang lọc theo:",
+      "clearAllTags": "Xóa tất cả",
+      "viewList": "Xem dạng danh sách",
+      "viewMap": "Xem dạng bản đồ (Sắp ra mắt)",
+      "filterTagPrefix": {
+        "transactionType": "Hình thức:",
+        "propertyType": "Loại:",
+        "province": "Tỉnh/TP:",
+        "district": "Quận/Huyện:",
+        "ward": "Phường/Xã:",
+        "price": "Giá:",
+        "area": "Diện tích:"
+      }
+    },
+    "states": {
+      "loading": "Đang tải danh sách bất động sản...",
+      "emptyTitle": "Không tìm thấy bất động sản phù hợp",
+      "emptyDescription": "Hiện chưa có tin đăng nào phù hợp với các tiêu chí tìm kiếm đã chọn. Vui lòng thử nới lỏng bộ lọc hoặc xóa bớt tiêu chí.",
+      "clearFiltersAction": "Xóa bộ lọc",
+      "errorTitle": "Không thể tải kết quả tìm kiếm",
+      "errorDescription": "Đã có lỗi xảy ra khi kết nối tới máy chủ bất động sản. Vui lòng thử lại sau.",
+      "retryButton": "Thử lại"
+    },
+    "pagination": {
+      "ariaLabel": "Phân trang kết quả tìm kiếm",
+      "previous": "Trước",
+      "next": "Tiếp",
+      "pageInfo": "Trang {page} / {totalPages}"
+    },
+    "mobile": {
+      "openFilters": "Bộ lọc tìm kiếm",
+      "filtersCount": "Bộ lọc ({count})",
+      "title": "Bộ lọc tìm kiếm",
+      "close": "Đóng"
+    },
+    "validation": {
+      "priceMinExceedsMax": "Mức giá tối thiểu không thể lớn hơn mức giá tối đa",
+      "areaMinExceedsMax": "Diện tích tối thiểu không thể lớn hơn diện tích tối đa",
+      "invalidNumber": "Vui lòng nhập số hợp lệ",
+      "negativeNumber": "Giá trị không thể là số âm"
     }
   }
 }

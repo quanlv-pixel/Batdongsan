@@ -5,7 +5,9 @@
     "loginTitle": "Sign In | Batdongsan",
     "loginDescription": "Sign in to Batdongsan to manage your property listings, track saved properties, and connect transparently.",
     "registerTitle": "Create Account | Batdongsan",
-    "registerDescription": "Create a Batdongsan account for home buyers, property owners, and professional real estate agents."
+    "registerDescription": "Create a Batdongsan account for home buyers, property owners, and professional real estate agents.",
+    "searchTitle": "Property Search Results | Batdongsan",
+    "searchDescription": "Search verified properties for sale and rent with transparent filters by location, property type, area, and price."
   },
   "LanguageSwitcher": {
     "ariaLabel": "Select display language",
@@ -318,6 +320,128 @@
       "emailConflict": "This email address is already registered. Please use another email or sign in.",
       "registerFailed": "Account registration failed. Please check your information and try again.",
       "networkError": "Unable to connect to the server. Please try again later."
+    }
+  },
+  "SearchResults": {
+    "breadcrumb": {
+      "home": "Home",
+      "searchResults": "Search Results",
+      "forSale": "Properties for Sale",
+      "forRent": "Properties for Rent"
+    },
+    "demoBadge": "Approved Listings",
+    "pageTitle": "Property Search Results",
+    "quickBar": {
+      "locationLabel": "Location",
+      "locationPlaceholder": "Select location or city",
+      "propertyTypeLabel": "Property Type",
+      "propertyTypeAll": "All Property Types",
+      "priceLabel": "Price Range",
+      "priceAll": "All Prices",
+      "areaLabel": "Area",
+      "areaAll": "All Areas",
+      "searchButton": "Search"
+    },
+    "filterSidebar": {
+      "heading": "Search Filters",
+      "resetButton": "Reset",
+      "applyButton": "Apply Filters",
+      "clearButton": "Clear Filters",
+      "location": {
+        "title": "Location",
+        "provinceLabel": "Province / City",
+        "provincePlaceholder": "All provinces / cities",
+        "districtLabel": "District",
+        "districtPlaceholder": "Enter district",
+        "wardLabel": "Ward",
+        "wardPlaceholder": "Enter ward"
+      },
+      "transactionType": {
+        "title": "Transaction Type",
+        "all": "All",
+        "forSale": "For Sale",
+        "forRent": "For Rent"
+      },
+      "propertyType": {
+        "title": "Property Type",
+        "all": "All Property Types",
+        "items": {
+          "APARTMENT": "Apartment",
+          "HOUSE": "House",
+          "LAND": "Land",
+          "VILLA": "Villa",
+          "COMMERCIAL": "Commercial",
+          "OTHER": "Other Property"
+        }
+      },
+      "price": {
+        "title": "Price Range (VND)",
+        "from": "From",
+        "to": "To",
+        "minPlaceholder": "Min price",
+        "maxPlaceholder": "Max price"
+      },
+      "area": {
+        "title": "Area (m²)",
+        "from": "From",
+        "to": "To",
+        "minPlaceholder": "Min area",
+        "maxPlaceholder": "Max area"
+      },
+      "upcoming": {
+        "title": "Extended Features (Coming Soon)",
+        "bedrooms": "Bedrooms",
+        "legalStatus": "Legal Status",
+        "legalRedBook": "Pink Book / Land Title",
+        "legalContract": "Sales Contract",
+        "notice": "This criterion belongs to the system's upcoming roadmap."
+      }
+    },
+    "results": {
+      "heading": "Matching Properties",
+      "count": "{total} results",
+      "sortBy": "Sort by:",
+      "sortNewest": "Newest (default)",
+      "activeFiltersLabel": "Active filters:",
+      "clearAllTags": "Clear all",
+      "viewList": "List view",
+      "viewMap": "Map view (Coming Soon)",
+      "filterTagPrefix": {
+        "transactionType": "Type:",
+        "propertyType": "Property:",
+        "province": "City:",
+        "district": "District:",
+        "ward": "Ward:",
+        "price": "Price:",
+        "area": "Area:"
+      }
+    },
+    "states": {
+      "loading": "Loading properties...",
+      "emptyTitle": "No matching properties found",
+      "emptyDescription": "There are currently no listings matching your selected search criteria. Please try broadening your filters or clearing criteria.",
+      "clearFiltersAction": "Clear filters",
+      "errorTitle": "Unable to load search results",
+      "errorDescription": "An error occurred while connecting to the property server. Please try again later.",
+      "retryButton": "Retry"
+    },
+    "pagination": {
+      "ariaLabel": "Search results pagination",
+      "previous": "Previous",
+      "next": "Next",
+      "pageInfo": "Page {page} of {totalPages}"
+    },
+    "mobile": {
+      "openFilters": "Search Filters",
+      "filtersCount": "Filters ({count})",
+      "title": "Search Filters",
+      "close": "Close"
+    },
+    "validation": {
+      "priceMinExceedsMax": "Minimum price cannot be greater than maximum price",
+      "areaMinExceedsMax": "Minimum area cannot be greater than maximum area",
+      "invalidNumber": "Please enter a valid number",
+      "negativeNumber": "Value cannot be negative"
     }
   }
 }

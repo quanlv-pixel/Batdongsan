@@ -67,7 +67,7 @@ export function resolveMetadataUrl(
 
 export function buildLocalizedPageMetadata(
   rawLocale: string,
-  pagePath: '/' | '/login' | '/register',
+  pagePath: '/' | '/login' | '/register' | '/bat-dong-san',
   env: Record<string, string | undefined> = process.env,
 ): Metadata {
   const locale: AppLocale = resolveLocale(rawLocale);
@@ -84,14 +84,18 @@ export function buildLocalizedPageMetadata(
       ? dict.Metadata.homeTitle
       : pagePath === '/login'
         ? dict.Metadata.loginTitle
-        : dict.Metadata.registerTitle;
+        : pagePath === '/register'
+          ? dict.Metadata.registerTitle
+          : dict.Metadata.searchTitle;
 
   const description =
     pagePath === '/'
       ? dict.Metadata.homeDescription
       : pagePath === '/login'
         ? dict.Metadata.loginDescription
-        : dict.Metadata.registerDescription;
+        : pagePath === '/register'
+          ? dict.Metadata.registerDescription
+          : dict.Metadata.searchDescription;
 
   return {
     ...(siteBaseUrl ? { metadataBase: siteBaseUrl } : {}),

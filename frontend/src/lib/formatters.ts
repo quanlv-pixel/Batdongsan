@@ -494,3 +494,152 @@ export function buildListingsSearchParams(
 
   return params;
 }
+
+/**
+ * Safely parses and normalizes URL search parameters (URLSearchParams or raw query object)
+ * into a typed PublicListingsQuery according to Backend QueryListingsDto validation rules.
+ *
+ * - Non-empty strings are trimmed.
+ * - Enums (transactionType, propertyType) are strictly validated against allowlists.
+ * - minPrice / maxPrice must match /^[1-9]\d*$/.
+ * - minArea / maxArea must be finite non-negative numbers.
+ * - page must be an integer >= 1.
+ * - limit must be an integer between 1 and 100.
+ */
+export function parseListingsSearchParams(
+  rawParams:
+    | URLSearchParams
+    | Record<string, string | string[] | undefined>
+    | undefined,
+): PublicListingsQuery {
+  const getParam = (key: string): string | undefined => {
+    if (!rawParams) return undefined;
+    if (typeof (rawParams as URLSearchParams).get === 'function') {
+      const val = (rawParams as URLSearchParams).get(key);
+      return val !== null ? val : undefined;
+    }
+    const val = (rawParams as Record<string, string | string[] | undefined>)[
+      key
+    ];
+    if (Array.isArray(val)) {
+      return val[0];
+    }
+    return val;
+  };
+
+  const query: PublicListingsQuery = {};
+
+  const txType = getParam('transactionType')?.trim();
+  if (txType && VALID_TRANSACTION_TYPES.has(txType as TransactionType)) {
+    query.transactionType = txType as TransactionType;
+  }
+
+  const propType = getParam('propertyType')?.trim();
+  if (propType && VALID_PROPERTY_TYPES.has(propType as PropertyType)) {
+    query.propertyType = propType as PropertyType;
+  }
+
+  const province = getParam('province')?.trim();
+  if (province) {
+    query.province = province;
+  }
+
+  const district = getParam('district')?.trim();
+  if (district) {
+    query.district = district;
+  }
+
+  const ward = getParam('ward')?.trim();
+  if (ward) {
+    query.ward = ward;
+  }
+
+  const rawMinPrice = getParam('minPrice')?.trim();
+  if (rawMinPrice && /^[1-9]\d*$/.test(rawMinPrice)) {
+    query.minPrice = rawMinPrice;
+  }
+
+  const rawMaxPrice = getParam('maxPrice')?.trim();
+  if (rawMaxPrice && /^[1-9]\d*$/.test(rawMaxPrice)) {
+    query.maxPrice = rawMaxPrice;
+  }
+
+  const rawMinArea = getParam('minArea')?.trim();
+  if (rawMinArea && !Number.isNaN(Number(rawMinArea))) {
+    const num = Number(rawMinArea);
+    if (Number.isFinite(num) && num >= 0) {
+      query.minArea = num;
+    }
+  }
+
+  const rawMaxArea = getParam('maxArea')?.trim();
+  if (rawMaxArea && !Number.isNaN(Number(rawMaxArea))) {
+    const num = Number(rawMaxArea);
+    if (Number.isFinite(num) && num >= 0) {
+      query.maxArea = num;
+    }
+  }
+
+  const rawPage = getParam('page')?.trim();
+  if (rawPage && /^\d+$/.test(rawPage)) {
+    const pageNum = parseInt(rawPage, 10);
+    if (pageNum >= 1) {
+      query.page = pageNum;
+    }
+  }
+
+  const rawLimit = getParam('limit')?.trim();
+  if (rawLimit && /^\d+$/.test(rawLimit)) {
+    const limitNum = parseInt(rawLimit, 10);
+    if (limitNum >= 1 && limitNum <= 100) {
+      query.limit = limitNum;
+    }
+  }
+
+  return query;
+}
+
+export interface FilterValidationErrors {
+  priceError?: string;
+  areaError?: string;
+}
+
+/**
+ * Validates that minimum values do not exceed maximum values for price and area ranges.
+ */
+export function validateFilterRanges(
+  query: Pick<
+    PublicListingsQuery,
+    'minPrice' | 'maxPrice' | 'minArea' | 'maxArea'
+  >,
+  dict?: {
+    priceMinExceedsMax?: string;
+    areaMinExceedsMax?: string;
+  },
+): FilterValidationErrors {
+  const errors: FilterValidationErrors = {};
+
+  if (query.minPrice && query.maxPrice) {
+    try {
+      if (BigInt(query.minPrice) > BigInt(query.maxPrice)) {
+        errors.priceError =
+          dict?.priceMinExceedsMax ||
+          'Mức giá tối thiểu không thể lớn hơn mức giá tối đa';
+      }
+    } catch {
+      // ignore
+    }
+  }
+
+  if (
+    typeof query.minArea === 'number' &&
+    typeof query.maxArea === 'number' &&
+    query.minArea > query.maxArea
+  ) {
+    errors.areaError =
+      dict?.areaMinExceedsMax ||
+      'Diện tích tối thiểu không thể lớn hơn diện tích tối đa';
+  }
+
+  return errors;
+}
