@@ -643,3 +643,20 @@ export function validateFilterRanges(
 
   return errors;
 }
+
+
+/**
+ * Generates a deterministic, unique user-facing reference code for a listing.
+ * Prefix is always BDS-.
+ */
+export function formatListingReferenceCode(id: string): string {
+  if (!id || typeof id !== 'string') return 'BDS-000000';
+  const clean = id.replace(/[^a-zA-Z0-9]/g, '').toUpperCase();
+  if (clean.startsWith('SEEDLISTING')) {
+    return `BDS-SEED${clean.replace('SEEDLISTING', '')}`;
+  }
+  if (clean.length <= 8) {
+    return `BDS-${clean}`;
+  }
+  return `BDS-${clean.slice(0, 4)}${clean.slice(-4)}`;
+}

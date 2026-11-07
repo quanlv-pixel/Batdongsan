@@ -3,7 +3,7 @@
 import React, { useState } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { useAuth } from '@/context/AuthContext';
 import { ApiClientError } from '@/lib/api-client';
 import { useDictionary, useLocalizedHref } from '@/i18n';
@@ -11,6 +11,14 @@ import { LanguageSwitcher } from '@/components/common/LanguageSwitcher';
 
 export default function LoginPage() {
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const rawReturnTo = searchParams?.get('returnTo') ?? null;
+  const safeReturnTo =
+    rawReturnTo &&
+    rawReturnTo.startsWith('/') &&
+    !rawReturnTo.startsWith('//')
+      ? rawReturnTo
+      : null;
   const { login } = useAuth();
   const dict = useDictionary();
   const localizeHref = useLocalizedHref();
@@ -38,7 +46,11 @@ export default function LoginPage() {
     try {
       await login({ email: email.trim(), password, rememberMe });
       // Redirect to home page upon successful login
-      router.push(localizeHref('/'));
+      if (safeReturnTo) {
+        router.push(safeReturnTo);
+      } else {
+        router.push(localizeHref('/'));
+      }
     } catch (err: unknown) {
       if (err instanceof ApiClientError) {
         if (err.statusCode === 401) {
@@ -368,7 +380,12 @@ export default function LoginPage() {
               <div className="text-center text-xs text-[#475569] pt-2">
                 <span>{dict.LoginPage.noAccountPrompt}</span>
                 <Link
-                  href={localizeHref('/register')}
+                  href={localizeHref(
+                    '/register' +
+                      (safeReturnTo
+                        ? `?returnTo=${encodeURIComponent(safeReturnTo)}`
+                        : ''),
+                  )}
                   className="text-[#0F766E] font-semibold hover:underline hover:text-[#0D655E] transition-colors"
                 >
                   {dict.LoginPage.registerNow}

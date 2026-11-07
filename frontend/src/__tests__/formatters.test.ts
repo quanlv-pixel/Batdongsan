@@ -4,6 +4,7 @@ import {
   formatAdministrativeLocation,
   formatArea,
   formatListingDate,
+  formatListingReferenceCode,
   formatPricePerSqm,
   formatVndPrice,
 } from '@/lib/formatters';
@@ -141,6 +142,18 @@ describe('Vietnamese Listing Formatters Unit Tests', () => {
       expect(params.get('minPrice')).toBe('2000000000');
       expect(params.has('maxPrice')).toBe(false);
       expect(params.get('minArea')).toBe('50');
+    });
+  });
+
+  describe('formatListingReferenceCode', () => {
+    it('generates unique deterministic reference codes with BDS- prefix', () => {
+      expect(formatListingReferenceCode('seed_listing_01')).toBe('BDS-SEED01');
+      expect(formatListingReferenceCode('seed_listing_02')).toBe('BDS-SEED02');
+      expect(formatListingReferenceCode('seed_listing_10')).toBe('BDS-SEED10');
+      expect(formatListingReferenceCode('prop_123')).toBe('BDS-PROP123');
+      expect(formatListingReferenceCode('a79d19ef-ca5d-4992-83ae-8203dc185963')).toBe('BDS-A79D5963');
+      expect(formatListingReferenceCode('listing_test_01')).toBe('BDS-LISTST01');
+      expect(formatListingReferenceCode('')).toBe('BDS-000000');
     });
   });
 });

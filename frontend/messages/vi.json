@@ -7,7 +7,10 @@
     "registerTitle": "Đăng ký tài khoản | Batdongsan",
     "registerDescription": "Tạo tài khoản Batdongsan dành cho người mua, chủ sở hữu bất động sản và môi giới chuyên nghiệp.",
     "searchTitle": "Tìm kiếm Bất động sản | Batdongsan",
-    "searchDescription": "Tìm kiếm danh sách bất động sản mua bán và cho thuê đã được kiểm duyệt với bộ lọc minh bạch theo vị trí, loại hình, diện tích và mức giá."
+    "searchDescription": "Tìm kiếm danh sách bất động sản mua bán và cho thuê đã được kiểm duyệt với bộ lọc minh bạch theo vị trí, loại hình, diện tích và mức giá.",
+    "detailTitle": "Chi tiết Bất động sản | Batdongsan",
+    "detailDescription": "Xem thông tin chi tiết, diện tích, mức giá và hình ảnh thực tế của bất động sản đã được kiểm duyệt trên Batdongsan.",
+    "detailNotFoundTitle": "Không tìm thấy bất động sản | Batdongsan"
   },
   "LanguageSwitcher": {
     "ariaLabel": "Chọn ngôn ngữ hiển thị",
@@ -442,6 +445,108 @@
       "areaMinExceedsMax": "Diện tích tối thiểu không thể lớn hơn diện tích tối đa",
       "invalidNumber": "Vui lòng nhập số hợp lệ",
       "negativeNumber": "Giá trị không thể là số âm"
+    }
+  },
+  "PropertyDetail": {
+    "breadcrumb": {
+      "home": "Trang chủ",
+      "forSale": "Mua bán bất động sản",
+      "forRent": "Cho thuê bất động sản",
+      "detail": "Chi tiết bất động sản"
+    },
+    "watermark": {
+      "badge": "Tin đăng thực tế đã kiểm duyệt",
+      "demoNotice": "Dữ liệu thực tế từ máy chủ Batdongsan"
+    },
+    "badges": {
+      "verified": "Tin xác thực",
+      "exclusive": "Độc quyền",
+      "approved": "Đã kiểm duyệt",
+      "listingCode": "Mã tin:"
+    },
+    "actions": {
+      "save": "Lưu tin",
+      "saved": "Đã lưu",
+      "share": "Chia sẻ",
+      "copied": "Đã sao chép liên kết!",
+      "comingSoon": "Sắp ra mắt",
+      "saveUpcomingNotice": "Tính năng lưu tin yêu thích đang được phát triển"
+    },
+    "gallery": {
+      "viewAllPhotos": "Xem tất cả {count} ảnh",
+      "photoCount": "Ảnh {current} / {total}",
+      "closeModal": "Đóng (Esc)",
+      "prevPhoto": "Ảnh trước",
+      "nextPhoto": "Ảnh sau",
+      "noPhotos": "Chưa có hình ảnh"
+    },
+    "overview": {
+      "priceNegotiable": "Giá niêm yết chính thức có thương lượng nhẹ",
+      "perSqmLabel": "Đơn giá m²:",
+      "area": "Diện tích",
+      "propertyType": "Loại hình",
+      "transactionType": "Hình thức",
+      "updatedAt": "Cập nhật"
+    },
+    "description": {
+      "title": "Mô tả bất động sản"
+    },
+    "specs": {
+      "title": "Thông tin chi tiết",
+      "propertyType": "Loại hình bất động sản",
+      "transactionType": "Hình thức giao dịch",
+      "area": "Diện tích sử dụng",
+      "price": "Mức giá niêm yết",
+      "pricePerSqm": "Đơn giá ước tính",
+      "province": "Tỉnh / Thành phố",
+      "district": "Quận / Huyện",
+      "ward": "Phường / Xã",
+      "status": "Trạng thái tin đăng",
+      "statusApproved": "Đã kiểm duyệt (Công khai)",
+      "postedDate": "Ngày đăng tin",
+      "lastUpdated": "Cập nhật lần cuối"
+    },
+    "location": {
+      "title": "Vị trí khu vực",
+      "privacyNotice": "Định vị bảo mật ở cấp độ Phường / Quận theo chính sách Batdongsan",
+      "privacyExplanation": "Nhằm bảo vệ quyền riêng tư của chủ sở hữu và an toàn giao dịch, địa chỉ số nhà chi tiết và tọa độ chính xác không được hiển thị công khai trên bản đồ. Bán kính hiển thị là mô phỏng khu vực hành chính mang tính minh họa, không dùng để định vị chính xác. Chuyên viên tư vấn sẽ hỗ trợ hướng dẫn xem nhà thực tế sau khi liên hệ.",
+      "radius": "Bán kính ước tính ~500m (minh họa)"
+    },
+    "contact": {
+      "title": "Quan tâm bất động sản này?",
+      "subtitle": "Gửi yêu cầu để được chuyên viên tư vấn liên hệ và hỗ trợ thông tin chi tiết.",
+      "unauthenticatedNotice": "Vui lòng đăng nhập để gửi yêu cầu liên hệ trực tiếp đến chuyên viên tư vấn phụ trách.",
+      "loginButton": "Đăng nhập để gửi yêu cầu",
+      "registerPrompt": "Chưa có tài khoản?",
+      "registerLink": "Đăng ký ngay",
+      "loggedInAs": "Đang gửi dưới tên:",
+      "roleLabel": "Vai trò:",
+      "messageLabel": "Lời nhắn hoặc yêu cầu cụ thể (tùy chọn)",
+      "messagePlaceholder": "Ví dụ: Tôi muốn tìm hiểu thêm về hồ sơ pháp lý và hẹn lịch xem nhà thực tế...",
+      "charCount": "{current}/1000 ký tự",
+      "consentLabel": "Tôi đồng ý để nhân viên tư vấn liên hệ và thông tin của tôi được xử lý theo Chính sách bảo mật của Batdongsan.",
+      "consentRequired": "Bạn cần đồng ý với điều khoản liên hệ trước khi gửi.",
+      "submitButton": "Gửi yêu cầu liên hệ",
+      "submitting": "Đang gửi yêu cầu...",
+      "successTitle": "Gửi yêu cầu thành công!",
+      "successMessage": "Yêu cầu liên hệ của bạn (mã: #{id}) đã được ghi nhận. Chuyên viên phụ trách sẽ liên hệ với bạn trong thời gian sớm nhất.",
+      "sendAnother": "Gửi yêu cầu khác",
+      "errorSelfListing": "Bạn không thể gửi yêu cầu liên hệ cho bất động sản của chính mình.",
+      "errorAdminRole": "Tài khoản Quản trị viên không thể tạo yêu cầu liên hệ khách hàng.",
+      "errorGeneral": "Đã có lỗi xảy ra khi gửi yêu cầu. Vui lòng thử lại sau.",
+      "privacyGuarantee": "Thông tin cá nhân của bạn được bảo mật tuyệt đối. Chúng tôi không chia sẻ dữ liệu với bên thứ ba không có thẩm quyền.",
+      "agentCardTitle": "Chuyên viên tư vấn khu vực",
+      "agentRole": "Hỗ trợ thông tin & Pháp lý",
+      "agentTrust": "Xác minh uy tín • Hỗ trợ 24/7",
+      "scheduleVisit": "Hẹn lịch xem nhà thực tế",
+      "scheduleVisitNotice": "Tính năng hẹn lịch trực tuyến đang được hoàn thiện. Vui lòng gửi yêu cầu liên hệ phía trên để chuyên viên sắp xếp lịch trực tiếp."
+    },
+    "states": {
+      "loading": "Đang tải chi tiết bất động sản...",
+      "notFoundTitle": "Không tìm thấy bất động sản",
+      "notFoundDescription": "Bất động sản này không tồn tại hoặc chưa được duyệt công khai trên hệ thống Batdongsan.",
+      "backToSearch": "Khám phá bất động sản khác",
+      "backToHome": "Về trang chủ"
     }
   }
 }
