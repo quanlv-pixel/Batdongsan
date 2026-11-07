@@ -1,0 +1,447 @@
+{
+  "Metadata": {
+    "homeTitle": "Batdongsan – Real Estate Discovery & Management Platform",
+    "homeDescription": "An online property discovery, listing, and internal MLS management platform for buyers, property owners, and real estate agents.",
+    "loginTitle": "Sign In | Batdongsan",
+    "loginDescription": "Sign in to Batdongsan to manage your property listings, track saved properties, and connect transparently.",
+    "registerTitle": "Create Account | Batdongsan",
+    "registerDescription": "Create a Batdongsan account for home buyers, property owners, and professional real estate agents.",
+    "searchTitle": "Property Search Results | Batdongsan",
+    "searchDescription": "Search verified properties for sale and rent with transparent filters by location, property type, area, and price."
+  },
+  "LanguageSwitcher": {
+    "ariaLabel": "Select display language",
+    "viLabel": "Tiếng Việt",
+    "enLabel": "English",
+    "viShort": "VI",
+    "enShort": "EN"
+  },
+  "Navbar": {
+    "brandName": "Batdongsan",
+    "brandSubtitle": "Property Information System",
+    "mainNavAriaLabel": "Main navigation",
+    "home": "Home",
+    "forSale": "For Sale",
+    "forRent": "For Rent",
+    "login": "Sign In",
+    "register": "Register",
+    "logout": "Sign Out",
+    "toggleMenuAriaLabel": "Toggle navigation menu",
+    "roles": {
+      "ADMIN": "Administrator",
+      "AGENT": "Agent",
+      "OWNER": "Property Owner",
+      "BUYER": "Buyer"
+    }
+  },
+  "Footer": {
+    "brandName": "Batdongsan",
+    "description": "A convenient, trusted online real estate discovery and management platform. A transparent market bridge integrated with an internal Multiple Listing Service (MLS).",
+    "exploreHeading": "Explore Properties",
+    "forSaleLink": "Properties for Sale",
+    "forRentLink": "Properties for Rent",
+    "apartmentLink": "Apartments",
+    "houseLink": "Houses & Townhouses",
+    "customerHeading": "For Members",
+    "homeLink": "Platform Home",
+    "loginLink": "Sign In to Account",
+    "registerLink": "Create Member Account",
+    "supportHeading": "Support",
+    "supportEmailLabel": "Support Email:",
+    "workingHoursLabel": "Working Hours:",
+    "workingHoursValue": "Mon - Fri (08:00 - 18:00)",
+    "copyright": "© 2026 Batdongsan. Academic platform for Information Technology capstone project.",
+    "operatingRules": "Operating Regulations",
+    "privacyPolicy": "Privacy Policy",
+    "termsOfService": "Terms of Service"
+  },
+  "HeroSearch": {
+    "title": "Find the Right Property for You",
+    "subtitle": "Discover ideal living spaces and investment opportunities tailored to your needs.",
+    "tablistAriaLabel": "Transaction type",
+    "tabSale": "For Sale",
+    "tabRent": "For Rent",
+    "tabProject": "Projects",
+    "comingSoon": "Coming Soon",
+    "projectTooltip": "Projects module is under development",
+    "provinceLabel": "Province / City",
+    "provincePlaceholder": "e.g. Ho Chi Minh City",
+    "districtLabel": "District",
+    "districtPlaceholder": "e.g. District 1",
+    "propertyTypeLabel": "Property Type",
+    "propertyTypeAll": "All Property Types",
+    "propertyTypes": {
+      "APARTMENT": "Apartment",
+      "HOUSE": "House / Townhouse",
+      "VILLA": "Villa",
+      "LAND": "Land",
+      "COMMERCIAL": "Commercial / Office",
+      "OTHER": "Other Property"
+    },
+    "priceRangeLabel": "Price Range",
+    "pricePlaceholder": "Price (VND)",
+    "salePricePresets": {
+      "under-2b": "Under 2B VND",
+      "2b-3b": "2B - 3B VND",
+      "3b-5b": "3B - 5B VND",
+      "5b-10b": "5B - 10B VND",
+      "above-10b": "Over 10B VND"
+    },
+    "rentPricePresets": {
+      "under-10m": "Under 10M VND",
+      "10m-20m": "10M - 20M VND",
+      "20m-50m": "20M - 50M VND",
+      "above-50m": "Over 50M VND"
+    },
+    "areaLabel": "Area",
+    "areaPlaceholder": "Area (m²)",
+    "areaPresets": {
+      "under-50": "Under 50 m²",
+      "50-80": "50 - 80 m²",
+      "80-120": "80 - 120 m²",
+      "120-200": "120 - 200 m²",
+      "above-200": "Over 200 m²"
+    },
+    "searchButton": "Search",
+    "minPriceLabel": "Min Price (VND)",
+    "minPricePlaceholder": "e.g. 2000000000",
+    "maxPriceLabel": "Max Price (VND)",
+    "maxPricePlaceholder": "e.g. 5000000000",
+    "minAreaLabel": "Min Area (m²)",
+    "minAreaPlaceholder": "e.g. 50",
+    "maxAreaLabel": "Max Area (m²)",
+    "maxAreaPlaceholder": "e.g. 120"
+  },
+  "CategoryGrid": {
+    "heading": "Explore Properties",
+    "subtitle": "Select the property category that matches your search goals",
+    "viewAll": "View all properties",
+    "items": {
+      "APARTMENT": {
+        "label": "Apartments",
+        "subtitle": "Condos & serviced apartments"
+      },
+      "HOUSE": {
+        "label": "Houses & Townhouses",
+        "subtitle": "Detached houses & shophouses"
+      },
+      "LAND": {
+        "label": "Land Plots",
+        "subtitle": "Residential & subdivided land"
+      },
+      "VILLA": {
+        "label": "Villas",
+        "subtitle": "Detached & semi-detached villas"
+      },
+      "COMMERCIAL": {
+        "label": "Commercial & Office",
+        "subtitle": "Retail spaces & office buildings"
+      },
+      "OTHER": {
+        "label": "Other Properties",
+        "subtitle": "Warehouses & other real estate"
+      }
+    }
+  },
+  "LatestListings": {
+    "verifiedBadge": "Verified Listings",
+    "heading": "Latest Properties",
+    "subtitle": "Recently approved properties publicly available on the platform",
+    "viewAll": "View all listings",
+    "loadingAriaLabel": "Loading property listings",
+    "errorHeading": "Unable to load property listings",
+    "defaultFetchError": "Unable to load property listings at this time. Please try again later.",
+    "emptyHeading": "No property listings available yet",
+    "emptyDescription": "There are currently no approved public listings available. Please check back later.",
+    "noImage": "No image available",
+    "photosCount": "{count} photos"
+  },
+  "TrustBenefits": {
+    "heading": "A Trusted & Efficient Real Estate Platform",
+    "subtitle": "Delivering a reliable connection between buyers, property owners, and professional real estate agents.",
+    "items": {
+      "search": {
+        "title": "Convenient Search",
+        "description": "Fast, multi-criteria filtering by location and budget. Easily compare prices and property sizes tailored to your needs."
+      },
+      "transparency": {
+        "title": "Transparent Information",
+        "description": "Clear property specifications on pricing, area, and administrative location. Every listing is carefully moderated before public release."
+      },
+      "management": {
+        "title": "Professional Listing Management",
+        "description": "Empowering owners and agents to share and update listing statuses in real time through an integrated internal MLS workflow."
+      }
+    }
+  },
+  "OwnerCta": {
+    "badge": "For Property Owners & Agents",
+    "heading": "Want to Sell or Rent Out Your Property?",
+    "description": "Reach potential buyers and connect with trusted agents quickly through our transparent moderation and internal MLS sharing system.",
+    "button": "Register an Account Now"
+  },
+  "LoginPage": {
+    "brandSubtitle": "Property Information System",
+    "demoBadge": "Demo Environment",
+    "backToHome": "Back to Home",
+    "heroImageAlt": "Modern apartment interior filled with natural light",
+    "verifiedEnvironment": "Trusted & transparent transaction environment",
+    "portalBadge": "Batdongsan Management Portal",
+    "welcomeTitle": "Welcome Back",
+    "welcomeSubtitle": "Sign in to manage your listings and continue your property search journey.",
+    "features": {
+      "manage": {
+        "title": "Manage Your Listings",
+        "description": "Easily create listings, track moderation status, and monitor performance."
+      },
+      "saved": {
+        "title": "Track Saved Properties",
+        "description": "Stay updated on price changes and matching property notifications."
+      },
+      "contacts": {
+        "title": "Receive & Manage Contact Requests",
+        "description": "Connect with potential clients securely with role-based access control."
+      }
+    },
+    "academicNote": "Academic platform for Information Technology capstone project.",
+    "formTitle": "Sign In",
+    "formSubtitle": "Enter your account credentials to access the platform.",
+    "emailLabel": "Email",
+    "emailPlaceholder": "Enter your email address",
+    "passwordLabel": "Password",
+    "passwordPlaceholder": "Enter your password",
+    "showPassword": "Show password",
+    "hidePassword": "Hide password",
+    "rememberMe": "Remember me",
+    "forgotPassword": "Forgot password?",
+    "sessionValidityNote": "* Sign-in sessions are currently valid for up to 15 minutes. Long-term persistent sessions will be supported once token refresh is enabled.",
+    "submitIdle": "Sign In",
+    "submitLoading": "Authenticating...",
+    "noAccountPrompt": "Don't have an account? ",
+    "registerNow": "Register now",
+    "termsPrefix": "By signing in, you agree to Batdongsan's",
+    "termsOfService": "Terms of Service",
+    "termsAnd": "and",
+    "privacyPolicy": "Privacy Policy",
+    "termsSuffix": ".",
+    "footerCopyright": "© 2026 Batdongsan. Academic platform for Information Technology capstone project.",
+    "operatingRules": "Operating Regulations",
+    "errors": {
+      "emptyFields": "Please enter both your email and password",
+      "invalidCredentials": "Invalid email or password",
+      "loginFailed": "Sign in failed. Please try again.",
+      "networkError": "Unable to connect to the server. Please check your connection."
+    },
+    "forgotModal": {
+      "title": "Password Recovery",
+      "closeAriaLabel": "Close",
+      "roadmapTitle": "Feature Under Development",
+      "roadmapDescription": "Password reset email delivery (GAP-03) is not yet supported by the backend API. Please use a demo account or contact an administrator for assistance.",
+      "acknowledgeButton": "Got it"
+    }
+  },
+  "RegisterPage": {
+    "brandSubtitle": "REAL ESTATE INFORMATION SYSTEM",
+    "backToHome": "Back to Home",
+    "heroImageAlt": "Luxury apartment filled with natural light overlooking green spaces",
+    "verifiedEnvironment": "Trusted & transparent transaction environment",
+    "welcomeTitle": "Start Your Journey with Batdongsan",
+    "welcomeSubtitle": "A transparent platform for discovering properties, connecting with partners, and managing real estate transactions effectively.",
+    "features": {
+      "search": {
+        "title": "Search Properties",
+        "description": "Browse verified houses, apartments, and land listings with transparent details."
+      },
+      "save": {
+        "title": "Save & Track Listings",
+        "description": "Monitor price updates and receive alerts on properties of interest."
+      },
+      "manage": {
+        "title": "Manage Listings & Inquiries",
+        "description": "Publish listings and handle buyer contact requests based on your account role."
+      }
+    },
+    "securityNote": "Information security and data encryption aligned with platform standards.",
+    "formTitle": "Create an Account",
+    "formSubtitle": "Fill in your details to get started with Batdongsan.",
+    "fullNameLabel": "Full Name",
+    "fullNamePlaceholder": "Nguyen Van A",
+    "emailLabel": "Email",
+    "emailPlaceholder": "name@example.com",
+    "phoneLabel": "Phone Number",
+    "phoneOptional": "(optional)",
+    "phonePlaceholder": "Enter contact phone number",
+    "phoneNote": "* Phone numbers are not stored at this stage. You can update this later once profile management is available.",
+    "passwordLabel": "Password",
+    "passwordPlaceholder": "Minimum 8 characters",
+    "showPassword": "Show password",
+    "hidePassword": "Hide password",
+    "confirmPasswordLabel": "Confirm Password",
+    "confirmPasswordPlaceholder": "Re-enter your password",
+    "showConfirmPassword": "Show confirm password",
+    "hideConfirmPassword": "Hide confirm password",
+    "usagePurposeLabel": "Primary Usage Intent",
+    "usageOptions": {
+      "BUYER": {
+        "title": "Buy or Rent Property",
+        "description": "Search listings, save favorites, and send contact requests."
+      },
+      "OWNER": {
+        "title": "List Property as Owner",
+        "description": "Create and manage listings for properties you own."
+      },
+      "AGENT": {
+        "title": "Real Estate Agent",
+        "description": "Access client management tools and internal MLS brokerage listings."
+      }
+    },
+    "roleNotePrefix": "Note:",
+    "roleNoteBody": "This only records your initial usage preference. Actual elevated account roles (Property Owner, Agent) are verified and granted through platform administration.",
+    "termsPrefix": "I agree to Batdongsan's",
+    "termsOfUse": "Terms of Use",
+    "termsAnd": "and",
+    "privacyPolicy": "Privacy Policy",
+    "termsSuffix": ".",
+    "submitIdle": "Create Account",
+    "submitLoading": "Processing...",
+    "hasAccountPrompt": "Already have an account?",
+    "signInLink": "Sign In",
+    "footerCopyright": "© 2026 Batdongsan. Online platform for real estate discovery, listing, and management.",
+    "operatingRules": "Operating Regulations",
+    "footerPrivacy": "Privacy Policy",
+    "footerTerms": "Terms of Service",
+    "successMessage": "Account created successfully! Redirecting to Sign In...",
+    "errors": {
+      "missingFullName": "Please enter your full name",
+      "missingEmail": "Please enter your email address",
+      "shortPassword": "Password must be at least 8 characters long",
+      "passwordMismatch": "Password and confirm password do not match",
+      "missingTerms": "Please agree to the Terms of Use and Privacy Policy",
+      "emailConflict": "This email address is already registered. Please use another email or sign in.",
+      "registerFailed": "Account registration failed. Please check your information and try again.",
+      "networkError": "Unable to connect to the server. Please try again later."
+    }
+  },
+  "SearchResults": {
+    "breadcrumb": {
+      "home": "Home",
+      "searchResults": "Search Results",
+      "forSale": "Properties for Sale",
+      "forRent": "Properties for Rent"
+    },
+    "demoBadge": "Approved Listings",
+    "pageTitle": "Property Search Results",
+    "quickBar": {
+      "locationLabel": "Location",
+      "locationPlaceholder": "Select location or city",
+      "propertyTypeLabel": "Property Type",
+      "propertyTypeAll": "All Property Types",
+      "priceLabel": "Price Range",
+      "priceAll": "All Prices",
+      "areaLabel": "Area",
+      "areaAll": "All Areas",
+      "searchButton": "Search"
+    },
+    "filterSidebar": {
+      "heading": "Search Filters",
+      "resetButton": "Reset",
+      "applyButton": "Apply Filters",
+      "clearButton": "Clear Filters",
+      "location": {
+        "title": "Location",
+        "provinceLabel": "Province / City",
+        "provincePlaceholder": "All provinces / cities",
+        "districtLabel": "District",
+        "districtPlaceholder": "Enter district",
+        "wardLabel": "Ward",
+        "wardPlaceholder": "Enter ward"
+      },
+      "transactionType": {
+        "title": "Transaction Type",
+        "all": "All",
+        "forSale": "For Sale",
+        "forRent": "For Rent"
+      },
+      "propertyType": {
+        "title": "Property Type",
+        "all": "All Property Types",
+        "items": {
+          "APARTMENT": "Apartment",
+          "HOUSE": "House",
+          "LAND": "Land",
+          "VILLA": "Villa",
+          "COMMERCIAL": "Commercial",
+          "OTHER": "Other Property"
+        }
+      },
+      "price": {
+        "title": "Price Range (VND)",
+        "from": "From",
+        "to": "To",
+        "minPlaceholder": "Min price",
+        "maxPlaceholder": "Max price"
+      },
+      "area": {
+        "title": "Area (m²)",
+        "from": "From",
+        "to": "To",
+        "minPlaceholder": "Min area",
+        "maxPlaceholder": "Max area"
+      },
+      "upcoming": {
+        "title": "Extended Features (Coming Soon)",
+        "bedrooms": "Bedrooms",
+        "legalStatus": "Legal Status",
+        "legalRedBook": "Pink Book / Land Title",
+        "legalContract": "Sales Contract",
+        "notice": "This criterion belongs to the system's upcoming roadmap."
+      }
+    },
+    "results": {
+      "heading": "Matching Properties",
+      "count": "{total} results",
+      "sortBy": "Sort by:",
+      "sortNewest": "Newest (default)",
+      "activeFiltersLabel": "Active filters:",
+      "clearAllTags": "Clear all",
+      "viewList": "List view",
+      "viewMap": "Map view (Coming Soon)",
+      "filterTagPrefix": {
+        "transactionType": "Type:",
+        "propertyType": "Property:",
+        "province": "City:",
+        "district": "District:",
+        "ward": "Ward:",
+        "price": "Price:",
+        "area": "Area:"
+      }
+    },
+    "states": {
+      "loading": "Loading properties...",
+      "emptyTitle": "No matching properties found",
+      "emptyDescription": "There are currently no listings matching your selected search criteria. Please try broadening your filters or clearing criteria.",
+      "clearFiltersAction": "Clear filters",
+      "errorTitle": "Unable to load search results",
+      "errorDescription": "An error occurred while connecting to the property server. Please try again later.",
+      "retryButton": "Retry"
+    },
+    "pagination": {
+      "ariaLabel": "Search results pagination",
+      "previous": "Previous",
+      "next": "Next",
+      "pageInfo": "Page {page} of {totalPages}"
+    },
+    "mobile": {
+      "openFilters": "Search Filters",
+      "filtersCount": "Filters ({count})",
+      "title": "Search Filters",
+      "close": "Close"
+    },
+    "validation": {
+      "priceMinExceedsMax": "Minimum price cannot be greater than maximum price",
+      "areaMinExceedsMax": "Minimum area cannot be greater than maximum area",
+      "invalidNumber": "Please enter a valid number",
+      "negativeNumber": "Value cannot be negative"
+    }
+  }
+}
