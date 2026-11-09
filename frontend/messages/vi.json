@@ -481,7 +481,6 @@
       "noPhotos": "Chưa có hình ảnh"
     },
     "overview": {
-      "priceNegotiable": "Giá niêm yết chính thức có thương lượng nhẹ",
       "perSqmLabel": "Đơn giá m²:",
       "area": "Diện tích",
       "propertyType": "Loại hình",
@@ -489,7 +488,8 @@
       "updatedAt": "Cập nhật"
     },
     "description": {
-      "title": "Mô tả bất động sản"
+      "title": "Mô tả bất động sản",
+      "noDescription": "Chưa có thông tin mô tả chi tiết cho bất động sản này."
     },
     "specs": {
       "title": "Thông tin chi tiết",
@@ -514,8 +514,8 @@
     },
     "contact": {
       "title": "Quan tâm bất động sản này?",
-      "subtitle": "Gửi yêu cầu để được chuyên viên tư vấn liên hệ và hỗ trợ thông tin chi tiết.",
-      "unauthenticatedNotice": "Vui lòng đăng nhập để gửi yêu cầu liên hệ trực tiếp đến chuyên viên tư vấn phụ trách.",
+      "subtitle": "Gửi yêu cầu để nhận thêm thông tin chi tiết và hỗ trợ từ chuyên viên tư vấn.",
+      "unauthenticatedNotice": "Vui lòng đăng nhập để gửi yêu cầu liên hệ và nhận tư vấn chi tiết về bất động sản.",
       "loginButton": "Đăng nhập để gửi yêu cầu",
       "registerPrompt": "Chưa có tài khoản?",
       "registerLink": "Đăng ký ngay",
@@ -529,15 +529,12 @@
       "submitButton": "Gửi yêu cầu liên hệ",
       "submitting": "Đang gửi yêu cầu...",
       "successTitle": "Gửi yêu cầu thành công!",
-      "successMessage": "Yêu cầu liên hệ của bạn (mã: #{id}) đã được ghi nhận. Chuyên viên phụ trách sẽ liên hệ với bạn trong thời gian sớm nhất.",
+      "successMessage": "Yêu cầu liên hệ của bạn (mã: #{id}) đã được ghi nhận trên hệ thống.",
       "sendAnother": "Gửi yêu cầu khác",
       "errorSelfListing": "Bạn không thể gửi yêu cầu liên hệ cho bất động sản của chính mình.",
       "errorAdminRole": "Tài khoản Quản trị viên không thể tạo yêu cầu liên hệ khách hàng.",
       "errorGeneral": "Đã có lỗi xảy ra khi gửi yêu cầu. Vui lòng thử lại sau.",
-      "privacyGuarantee": "Thông tin cá nhân của bạn được bảo mật tuyệt đối. Chúng tôi không chia sẻ dữ liệu với bên thứ ba không có thẩm quyền.",
-      "agentCardTitle": "Chuyên viên tư vấn khu vực",
-      "agentRole": "Hỗ trợ thông tin & Pháp lý",
-      "agentTrust": "Xác minh uy tín • Hỗ trợ 24/7",
+      "privacyGuarantee": "Thông tin liên hệ của bạn được xử lý theo Chính sách bảo mật của Batdongsan nhằm phục vụ mục đích tư vấn bất động sản.",
       "scheduleVisit": "Hẹn lịch xem nhà thực tế",
       "scheduleVisitNotice": "Tính năng hẹn lịch trực tuyến đang được hoàn thiện. Vui lòng gửi yêu cầu liên hệ phía trên để chuyên viên sắp xếp lịch trực tiếp."
     },

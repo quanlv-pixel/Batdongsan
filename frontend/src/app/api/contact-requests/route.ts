@@ -18,18 +18,9 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    let body: {
-      listingId?: string;
-      message?: string;
-      contactConsent?: boolean;
-    };
-
+    let body: unknown;
     try {
-      body = (await request.json()) as {
-        listingId?: string;
-        message?: string;
-        contactConsent?: boolean;
-      };
+      body = await request.json();
     } catch {
       return NextResponse.json(
         {
@@ -41,7 +32,22 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const { listingId, message, contactConsent } = body ?? {};
+    if (!body || typeof body !== 'object' || Array.isArray(body)) {
+      return NextResponse.json(
+        {
+          statusCode: 400,
+          message: 'Dữ liệu yêu cầu không hợp lệ.',
+          error: 'Bad Request',
+        },
+        { status: 400 },
+      );
+    }
+
+    const { listingId, message, contactConsent } = body as {
+      listingId?: unknown;
+      message?: unknown;
+      contactConsent?: unknown;
+    };
 
     if (!listingId || typeof listingId !== 'string' || !listingId.trim()) {
       return NextResponse.json(
@@ -66,7 +72,18 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    if (message && typeof message === 'string' && message.length > 1000) {
+    if (message !== undefined && message !== null && typeof message !== 'string') {
+      return NextResponse.json(
+        {
+          statusCode: 400,
+          message: 'Lời nhắn phải là chuỗi ký tự hợp lệ.',
+          error: 'Bad Request',
+        },
+        { status: 400 },
+      );
+    }
+
+    if (typeof message === 'string' && message.length > 1000) {
       return NextResponse.json(
         {
           statusCode: 400,
@@ -124,13 +141,12 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json(responseData, { status: 201 });
   } catch (error: unknown) {
-    const errorMsg =
-      error instanceof Error ? error.message : 'Internal Server Error';
+    console.error('[ContactRequestsBFF] Error:', error);
     return NextResponse.json(
       {
         statusCode: 500,
         message: 'Đã có lỗi xảy ra trên hệ thống. Vui lòng thử lại sau.',
-        error: errorMsg,
+        error: 'Internal Server Error',
       },
       { status: 500 },
     );

@@ -481,7 +481,6 @@
       "noPhotos": "No photos available"
     },
     "overview": {
-      "priceNegotiable": "Official listed price negotiable",
       "perSqmLabel": "Per m²:",
       "area": "Area",
       "propertyType": "Property Type",
@@ -489,7 +488,8 @@
       "updatedAt": "Updated"
     },
     "description": {
-      "title": "Property Description"
+      "title": "Property Description",
+      "noDescription": "No detailed description has been provided for this property."
     },
     "specs": {
       "title": "Property Specifications",
@@ -509,13 +509,13 @@
     "location": {
       "title": "Regional Location",
       "privacyNotice": "Privacy-protected location at Ward / District level per Batdongsan policy",
-      "privacyExplanation": "To protect owner privacy and ensure transaction safety, exact street addresses and private coordinates are not publicly exposed. The displayed radius is an illustrative regional simulation and does not represent an exact map location. A verified advisor will coordinate physical visits upon request.",
+      "privacyExplanation": "To protect owner privacy and ensure transaction safety, exact street addresses and private coordinates are not publicly exposed. The displayed radius is an illustrative regional simulation and does not represent an exact map location. A consultation advisor will coordinate physical visits upon request.",
       "radius": "Estimated ~500m radius (illustrative)"
     },
     "contact": {
       "title": "Interested in this property?",
-      "subtitle": "Send a consultation request to connect with a verified advisor and receive complete property details.",
-      "unauthenticatedNotice": "Please sign in to send a consultation request directly to a verified advisor.",
+      "subtitle": "Send a consultation request to receive property details and support.",
+      "unauthenticatedNotice": "Please sign in to send a consultation request and receive property details.",
       "loginButton": "Sign in to send request",
       "registerPrompt": "Don't have an account?",
       "registerLink": "Register now",
@@ -529,15 +529,12 @@
       "submitButton": "Submit Contact Request",
       "submitting": "Submitting request...",
       "successTitle": "Request Submitted Successfully!",
-      "successMessage": "Your contact request (ID: #{id}) has been recorded. A dedicated advisor will reach out to you shortly.",
+      "successMessage": "Your contact request (ID: #{id}) has been recorded on the platform.",
       "sendAnother": "Send another request",
       "errorSelfListing": "You cannot submit a contact request for your own listing.",
       "errorAdminRole": "Administrator accounts cannot create contact requests.",
       "errorGeneral": "An error occurred while sending your request. Please try again.",
-      "privacyGuarantee": "Your personal information is strictly protected. We never share data with unauthorized third parties.",
-      "agentCardTitle": "Dedicated Area Advisor",
-      "agentRole": "Information & Legal Support",
-      "agentTrust": "Verified • 24/7 Support",
+      "privacyGuarantee": "Your contact information is processed under Batdongsan's Privacy Policy solely for property consultation purposes.",
       "scheduleVisit": "Schedule a Property Visit",
       "scheduleVisitNotice": "Online scheduling is in development. Please submit the consultation request above to schedule a visit directly."
     },

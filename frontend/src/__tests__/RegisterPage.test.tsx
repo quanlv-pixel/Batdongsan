@@ -5,18 +5,23 @@ import RegisterPage from '@/app/[locale]/register/page';
 import * as AuthContextModule from '@/context/AuthContext';
 import { ApiClientError } from '@/lib/api-client';
 
-const mockPush = vi.fn();
+const { mockPush, mockSearchParamsRef } = vi.hoisted(() => ({
+  mockPush: vi.fn(),
+  mockSearchParamsRef: { current: new URLSearchParams() },
+}));
+
 vi.mock('next/navigation', () => ({
   useRouter: () => ({
     push: mockPush,
   }),
-  useSearchParams: () => new URLSearchParams(),
+  useSearchParams: () => mockSearchParamsRef.current,
 }));
 
 describe('RegisterPage Component Tests', () => {
   beforeEach(() => {
     vi.restoreAllMocks();
     mockPush.mockReset();
+    mockSearchParamsRef.current = new URLSearchParams();
   });
 
   afterEach(() => {
@@ -238,5 +243,42 @@ describe('RegisterPage Component Tests', () => {
     expect(
       screen.getByText(/Thông tin số điện thoại chưa được lưu ở giai đoạn này/i),
     ).toBeDefined();
+  });
+
+  it('7. Safe returnTo parameter is sanitized and forwarded to login redirect link', () => {
+    mockSearchParamsRef.current = new URLSearchParams('returnTo=%2Fvi%2Fbat-dong-san%2Fseed_listing_01');
+    vi.spyOn(AuthContextModule, 'useAuth').mockReturnValue({
+      user: null,
+      isAuthenticated: false,
+      isLoading: false,
+      login: vi.fn(),
+      register: vi.fn(),
+      logout: vi.fn(),
+      refreshUser: vi.fn(),
+    });
+
+    render(<RegisterPage />);
+
+    const loginLink = screen.getByRole('link', { name: 'Đăng nhập' });
+    expect(loginLink.getAttribute('href')).toContain('returnTo=%2Fvi%2Fbat-dong-san%2Fseed_listing_01');
+  });
+
+  it('8. Unsafe returnTo (open redirect attempt) is rejected and not forwarded to login link', () => {
+    mockSearchParamsRef.current = new URLSearchParams('returnTo=%2F%5C%5Cevil.example');
+    vi.spyOn(AuthContextModule, 'useAuth').mockReturnValue({
+      user: null,
+      isAuthenticated: false,
+      isLoading: false,
+      login: vi.fn(),
+      register: vi.fn(),
+      logout: vi.fn(),
+      refreshUser: vi.fn(),
+    });
+
+    render(<RegisterPage />);
+
+    const loginLink = screen.getByRole('link', { name: 'Đăng nhập' });
+    expect(loginLink.getAttribute('href')).not.toContain('evil.example');
+    expect(loginLink.getAttribute('href')).toBe('/login');
   });
 });

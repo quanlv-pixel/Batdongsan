@@ -29,7 +29,7 @@ export function PropertyDescription({ description }: PropertyDescriptionProps) {
           paragraphs.map((para, idx) => <p key={idx}>{para}</p>)
         ) : (
           <p className="text-slate-400 italic">
-            Chưa có thông tin mô tả chi tiết cho bất động sản này.
+            {dict.PropertyDetail.description.noDescription}
           </p>
         )}
       </div>

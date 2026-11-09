@@ -8,6 +8,8 @@ import { PropertyDescription } from '@/components/detail/PropertyDescription';
 import { PropertySpecsTable } from '@/components/detail/PropertySpecsTable';
 import { PropertyLocationNotice } from '@/components/detail/PropertyLocationNotice';
 import { PropertyContactCard } from '@/components/detail/PropertyContactCard';
+import ListingDetailNotFound from '@/app/[locale]/bat-dong-san/[id]/not-found';
+import ListingDetailError from '@/app/[locale]/bat-dong-san/[id]/error';
 import { buildLocalizedListingDetailMetadata } from '@/i18n/metadata';
 import {
   fetchPublicListingDetail,
@@ -208,6 +210,41 @@ describe('PHASE 2E-2C — Property Detail & Contact Requests', () => {
       expect(screen.queryByRole('dialog')).toBeNull();
     });
 
+    it('opens lightbox on Space keydown on primary image and thumbnails', () => {
+      render(
+        <AppLocaleProvider locale="vi">
+          <PropertyGallery images={sampleListing.images} title={sampleListing.title} />
+        </AppLocaleProvider>,
+      );
+
+      const primaryBtn = screen.getByRole('button', {
+        name: sampleListing.title,
+      });
+
+      // Press Space on primary image
+      fireEvent.keyDown(primaryBtn, { key: ' ' });
+      let dialog = screen.getByRole('dialog');
+      expect(dialog).toBeDefined();
+      expect(within(dialog).getByText('Ảnh 1 / 6')).toBeDefined();
+
+      // Close dialog
+      fireEvent.keyDown(window, { key: 'Escape' });
+      expect(screen.queryByRole('dialog')).toBeNull();
+
+      // Press Space on thumbnail 2
+      const thumbBtn = screen.getByRole('button', {
+        name: new RegExp(`${sampleListing.title} - Ảnh 2`),
+      });
+      fireEvent.keyDown(thumbBtn, { key: ' ' });
+      dialog = screen.getByRole('dialog');
+      expect(dialog).toBeDefined();
+      expect(within(dialog).getByText('Ảnh 2 / 6')).toBeDefined();
+
+      // Close dialog
+      fireEvent.keyDown(window, { key: 'Escape' });
+      expect(screen.queryByRole('dialog')).toBeNull();
+    });
+
     it('renders fallback state when images array is empty', () => {
       render(
         <AppLocaleProvider locale="vi">
@@ -293,6 +330,30 @@ describe('PHASE 2E-2C — Property Detail & Contact Requests', () => {
         screen.getByText(/Bàn giao nội thất cao cấp quốc tế\./),
       ).toBeDefined();
     });
+
+    it('renders localized empty fallback when description is empty or whitespace', () => {
+      const { rerender } = render(
+        <AppLocaleProvider locale="vi">
+          <PropertyDescription description="" />
+        </AppLocaleProvider>,
+      );
+      expect(
+        screen.getByText(
+          'Chưa có thông tin mô tả chi tiết cho bất động sản này.',
+        ),
+      ).toBeDefined();
+
+      rerender(
+        <AppLocaleProvider locale="en">
+          <PropertyDescription description="   " />
+        </AppLocaleProvider>,
+      );
+      expect(
+        screen.getByText(
+          'No detailed description has been provided for this property.',
+        ),
+      ).toBeDefined();
+    });
   });
 
   describe('5. PropertySpecsTable Component', () => {
@@ -354,7 +415,7 @@ describe('PHASE 2E-2C — Property Detail & Contact Requests', () => {
       expect(screen.getByText('Quan tâm bất động sản này?')).toBeDefined();
       expect(
         screen.getByText(
-          'Vui lòng đăng nhập để gửi yêu cầu liên hệ trực tiếp đến chuyên viên tư vấn phụ trách.',
+          'Vui lòng đăng nhập để gửi yêu cầu liên hệ và nhận tư vấn chi tiết về bất động sản.',
         ),
       ).toBeDefined();
 
@@ -559,6 +620,44 @@ describe('PHASE 2E-2C — Property Detail & Contact Requests', () => {
 
       expect(meta.title).toBe('Không tìm thấy bất động sản | Batdongsan');
       expect(meta.description).toContain('không tồn tại hoặc chưa được duyệt');
+    });
+  });
+
+  describe('9. ListingDetailNotFound and ListingDetailError components', () => {
+    it('renders not found page with 404 testids and back button', () => {
+      render(
+        <AppLocaleProvider locale="vi">
+          <ListingDetailNotFound />
+        </AppLocaleProvider>,
+      );
+
+      expect(screen.getByTestId('detail-not-found-container')).toBeDefined();
+      expect(screen.getByTestId('detail-not-found-title')).toBeDefined();
+      expect(screen.getByTestId('detail-not-found-description')).toBeDefined();
+      const backBtn = screen.getByTestId('detail-not-found-back-btn');
+      expect(backBtn.getAttribute('href')).toBe('/vi/bat-dong-san');
+    });
+
+    it('renders error page with 500 testids and triggers reset on retry', () => {
+      const consoleErrorSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
+      const resetMock = vi.fn();
+      render(
+        <AppLocaleProvider locale="vi">
+          <ListingDetailError
+            error={new Error('Database timeout')}
+            reset={resetMock}
+          />
+        </AppLocaleProvider>,
+      );
+
+      expect(screen.getByTestId('detail-error-container')).toBeDefined();
+      expect(screen.getByTestId('detail-error-title')).toBeDefined();
+      expect(screen.getByTestId('detail-error-description')).toBeDefined();
+
+      const retryBtn = screen.getByTestId('detail-error-retry-btn');
+      fireEvent.click(retryBtn);
+      expect(resetMock).toHaveBeenCalledTimes(1);
+      consoleErrorSpy.mockRestore();
     });
   });
 });

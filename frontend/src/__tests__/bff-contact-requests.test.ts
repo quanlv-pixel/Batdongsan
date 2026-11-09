@@ -201,4 +201,59 @@ describe('BFF Contact Requests Route Handler (/api/contact-requests)', () => {
       'Cannot create a contact request for your own listing',
     );
   });
+
+  it('8. Returns 400 when body is an array or malformed', async () => {
+    mockCookieGet.mockReturnValue({ value: 'valid_jwt_token' });
+
+    const req = new NextRequest('http://localhost:3000/api/contact-requests', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify([1, 2, 3]),
+    });
+
+    const res = await contactRequestHandler(req);
+    expect(res.status).toBe(400);
+    const data = await res.json();
+    expect(data.error).toBe('Bad Request');
+  });
+
+  it('9. Returns 400 when message is not a string type', async () => {
+    mockCookieGet.mockReturnValue({ value: 'valid_jwt_token' });
+
+    const req = new NextRequest('http://localhost:3000/api/contact-requests', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        listingId: 'listing_01',
+        contactConsent: true,
+        message: { malicious: 'object' },
+      }),
+    });
+
+    const res = await contactRequestHandler(req);
+    expect(res.status).toBe(400);
+    const data = await res.json();
+    expect(data.message).toContain('Lời nhắn phải là chuỗi ký tự hợp lệ');
+  });
+
+  it('10. Returns 500 with generic Internal Server Error without leaking internal stack/exception', async () => {
+    mockCookieGet.mockReturnValue({ value: 'valid_jwt_token' });
+    global.fetch = vi.fn().mockRejectedValueOnce(new Error('Sensitive DB Connection string leaked!'));
+
+    const req = new NextRequest('http://localhost:3000/api/contact-requests', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        listingId: 'listing_01',
+        contactConsent: true,
+        message: 'Hello',
+      }),
+    });
+
+    const res = await contactRequestHandler(req);
+    expect(res.status).toBe(500);
+    const data = await res.json();
+    expect(data.error).toBe('Internal Server Error');
+    expect(data.error).not.toContain('Sensitive DB');
+  });
 });

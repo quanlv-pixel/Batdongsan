@@ -97,7 +97,12 @@ export function PropertyGallery({ images, title }: PropertyGalleryProps) {
             onClick={() => openLightbox(0)}
             role="button"
             tabIndex={0}
-            onKeyDown={(e) => e.key === 'Enter' && openLightbox(0)}
+            onKeyDown={(e) => {
+              if (e.key === 'Enter' || e.key === ' ') {
+                e.preventDefault();
+                openLightbox(0);
+              }
+            }}
             aria-label={title}
           >
             {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -139,9 +144,12 @@ export function PropertyGallery({ images, title }: PropertyGalleryProps) {
                     onClick={() => openLightbox(actualIndex)}
                     role="button"
                     tabIndex={0}
-                    onKeyDown={(e) =>
-                      e.key === 'Enter' && openLightbox(actualIndex)
-                    }
+                    onKeyDown={(e) => {
+                      if (e.key === 'Enter' || e.key === ' ') {
+                        e.preventDefault();
+                        openLightbox(actualIndex);
+                      }
+                    }}
                     aria-label={`${title} - ${dict.PropertyDetail.gallery.photoCount
                       .replace('{current}', String(actualIndex + 1))
                       .replace('{total}', String(totalCount))}`}

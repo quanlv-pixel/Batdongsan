@@ -329,33 +329,6 @@ export function PropertyContactCard({ listing }: PropertyContactCardProps) {
           </p>
         </div>
       </div>
-
-      {/* Verified Dedicated Advisor Mini-Card */}
-      <div className="bg-white p-5 rounded-xl border border-[#E2E8F0] shadow-sm flex items-center gap-4">
-        <div className="relative w-12 h-12 rounded-full overflow-hidden shrink-0 border border-slate-200 bg-teal-50 flex items-center justify-center text-[#0F766E] font-bold text-lg">
-          <span className="material-symbols-outlined text-2xl">
-            support_agent
-          </span>
-        </div>
-        <div className="min-w-0 flex-1">
-          <div className="flex items-center gap-1.5">
-            <h3 className="text-sm font-bold text-[#142B4A] truncate">
-              {dict.PropertyDetail.contact.agentCardTitle}
-            </h3>
-            <span className="material-symbols-outlined text-[#0F766E] text-base">
-              check_circle
-            </span>
-          </div>
-          <p className="text-xs text-slate-500">
-            {dict.PropertyDetail.contact.agentRole}
-          </p>
-          <div className="flex items-center gap-2 mt-1 text-xs font-semibold text-[#0F766E]">
-            <span className="text-slate-400 font-normal">
-              {dict.PropertyDetail.contact.agentTrust}
-            </span>
-          </div>
-        </div>
-      </div>
     </aside>
   );
 }

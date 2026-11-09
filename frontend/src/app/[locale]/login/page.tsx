@@ -8,17 +8,13 @@ import { useAuth } from '@/context/AuthContext';
 import { ApiClientError } from '@/lib/api-client';
 import { useDictionary, useLocalizedHref } from '@/i18n';
 import { LanguageSwitcher } from '@/components/common/LanguageSwitcher';
+import { sanitizeReturnTo } from '@/lib/navigation';
 
 export default function LoginPage() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const rawReturnTo = searchParams?.get('returnTo') ?? null;
-  const safeReturnTo =
-    rawReturnTo &&
-    rawReturnTo.startsWith('/') &&
-    !rawReturnTo.startsWith('//')
-      ? rawReturnTo
-      : null;
+  const safeReturnTo = sanitizeReturnTo(rawReturnTo);
   const { login } = useAuth();
   const dict = useDictionary();
   const localizeHref = useLocalizedHref();

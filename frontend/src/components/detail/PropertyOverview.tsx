@@ -152,9 +152,6 @@ export function PropertyOverview({ listing, locale }: PropertyOverviewProps) {
             {perSqmFormatted}
           </span>
         )}
-        <span className="text-xs text-slate-400 italic sm:ml-auto">
-          {dict.PropertyDetail.overview.priceNegotiable}
-        </span>
       </div>
 
       {/* 4 Core Parameter Badges (Preserving Data Truthfulness) */}

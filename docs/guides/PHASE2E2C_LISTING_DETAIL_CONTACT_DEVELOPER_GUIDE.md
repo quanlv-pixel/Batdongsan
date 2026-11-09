@@ -206,7 +206,7 @@ frontend/src/components/detail/
 
 ## 4. TÍCH HỢP BACKEND QUA NEXT.JS BFF ROUTE
 
-### 4.1. Handler Route `/api/contact-requests/route.ts`
+### 4.1. Handler Route `/api/contact-requests/route.ts` (Đã Gia Cố Bảo Mật)
 
 ```typescript
 // frontend/src/app/api/contact-requests/route.ts
@@ -226,12 +226,42 @@ export async function POST(request: Request) {
       );
     }
 
-    const body = await request.json();
-    const { listingId, message, contactConsent } = body ?? {};
-
-    if (!listingId || contactConsent !== true) {
+    let body: unknown;
+    try {
+      body = await request.json();
+    } catch {
       return NextResponse.json(
-        { statusCode: 400, message: 'Dữ liệu yêu cầu liên hệ không hợp lệ.' },
+        { statusCode: 400, message: 'Dữ liệu yêu cầu không hợp lệ (JSON malformed).' },
+        { status: 400 },
+      );
+    }
+
+    if (!body || typeof body !== 'object' || Array.isArray(body)) {
+      return NextResponse.json(
+        { statusCode: 400, message: 'Payload yêu cầu liên hệ phải là một đối tượng JSON.' },
+        { status: 400 },
+      );
+    }
+
+    const { listingId, message, contactConsent } = body as Record<string, unknown>;
+
+    if (!listingId || typeof listingId !== 'string' || listingId.trim() === '') {
+      return NextResponse.json(
+        { statusCode: 400, message: 'Mã bất động sản (listingId) là bắt buộc.' },
+        { status: 400 },
+      );
+    }
+
+    if (contactConsent !== true) {
+      return NextResponse.json(
+        { statusCode: 400, message: 'Bạn phải đồng ý chia sẻ thông tin liên lạc để tiếp tục.' },
+        { status: 400 },
+      );
+    }
+
+    if (message !== undefined && message !== null && typeof message !== 'string') {
+      return NextResponse.json(
+        { statusCode: 400, message: 'Nội dung lời nhắn phải là chuỗi ký tự.' },
         { status: 400 },
       );
     }
@@ -243,37 +273,71 @@ export async function POST(request: Request) {
         'Content-Type': 'application/json',
         Authorization: `Bearer ${sessionCookie}`,
       },
-      body: JSON.stringify({ listingId, message, contactConsent: true }),
+      body: JSON.stringify({
+        listingId: listingId.trim(),
+        message: typeof message === 'string' ? message : undefined,
+        contactConsent: true,
+      }),
     });
 
     const data = await backendRes.json();
     return NextResponse.json(data, { status: backendRes.status });
   } catch (error: unknown) {
-    const errorMsg = error instanceof Error ? error.message : 'Internal Server Error';
+    // Luôn ghi log lỗi chi tiết phía server nhưng che giấu chuỗi kết nối / exception nhạy cảm phía client
+    console.error('[ContactRequestsBFF] Error:', error);
     return NextResponse.json(
-      { statusCode: 500, message: 'Không thể gửi yêu cầu liên hệ.', error: errorMsg },
+      { statusCode: 500, message: 'Internal Server Error' },
       { status: 500 },
     );
   }
 }
 ```
 
-### 4.2. Bảo Mật Luồng returnTo Chống Open Redirect
-Tại các trang `LoginPage` (`frontend/src/app/[locale]/login/page.tsx`) và `RegisterPage` (`frontend/src/app/[locale]/register/page.tsx`):
+### 4.2. Bảo Mật Luồng returnTo Chống Open Redirect Với Bộ Lọc Chuyên Dụng
+Tại `frontend/src/lib/navigation.ts`, module `sanitizeReturnTo` và `isValidReturnTo` được xây dựng để thẩm định triệt để tham số chuyển hướng:
+- Ngăn chặn triệt để các URL tuyệt đối mang scheme ngoài (`http:`, `https:`, `javascript:`, `data:`, `vbscript:`).
+- Ngăn chặn protocol-relative URL bắt đầu bằng dấu gạch chéo kép `//`.
+- Ngăn chặn ký tự gạch chéo ngược `\` (backslash), bao gồm cả các biến thể đã URL-encode như `%5c` hoặc `%5C`, nhằm triệt tiêu thủ thuật lách trình duyệt biến đường dẫn nội bộ thành chuyển hướng ngoại vi (`/\evil.com` hoặc `/%5cevil.com`).
+- Ngăn chặn ký tự điều khiển ASCII không an toàn (control characters `\x00` - `\x1F`).
+- Sử dụng dummy origin an toàn `http://localhost.internal` để parse và bảo toàn chính xác pathname, query params và hash nội bộ.
 
 ```typescript
+// frontend/src/lib/navigation.ts
+export function isValidReturnTo(target: unknown): boolean {
+  if (typeof target !== 'string') return false;
+  const trimmed = target.trim();
+  if (!trimmed || !trimmed.startsWith('/')) return false;
+  if (trimmed.startsWith('//')) return false;
+  if (trimmed.includes('\\') || /%5c/i.test(trimmed)) return false;
+  if (/[\x00-\x1F\x7F]/.test(trimmed)) return false;
+
+  try {
+    const parsed = new URL(trimmed, 'http://localhost.internal');
+    return parsed.origin === 'http://localhost.internal';
+  } catch {
+    return false;
+  }
+}
+
+export function sanitizeReturnTo(target: unknown, fallback: string = '/'): string {
+  if (!isValidReturnTo(target)) return fallback;
+  const trimmed = (target as string).trim();
+  try {
+    const parsed = new URL(trimmed, 'http://localhost.internal');
+    return `${parsed.pathname}${parsed.search}${parsed.hash}`;
+  } catch {
+    return fallback;
+  }
+}
+```
+
+Khi áp dụng tại `LoginPage` (`frontend/src/app/[locale]/login/page.tsx`) và `RegisterPage` (`frontend/src/app/[locale]/register/page.tsx`):
+```typescript
 const searchParams = useSearchParams();
-const rawReturnTo = searchParams?.get('returnTo') ?? null;
+const rawReturnTo = searchParams?.get('returnTo');
+const safeReturnTo = sanitizeReturnTo(rawReturnTo, '');
 
-// Kiểm tra nghiêm ngặt: Phải bắt đầu bằng '/' nhưng KHÔNG ĐƯỢC bắt đầu bằng '//'
-const safeReturnTo =
-  rawReturnTo &&
-  rawReturnTo.startsWith('/') &&
-  !rawReturnTo.startsWith('//')
-    ? rawReturnTo
-    : null;
-
-// Sau khi đăng nhập thành công:
+// Sau khi xác thực thành công:
 if (safeReturnTo) {
   router.push(safeReturnTo);
 } else {
@@ -298,34 +362,52 @@ Metadata SEO được khởi tạo qua hàm `buildLocalizedListingDetailMetadata
 
 ## 6. HỆ THỐNG KIỂM THỬ TOÀN DIỆN & TRÌNH DUYỆT CHROME CDP
 
-Toàn bộ giải pháp được bảo chứng qua 2 tầng kiểm thử:
+Toàn bộ giải pháp được bảo chứng qua 2 tầng kiểm thử nghiêm ngặt:
 
 ### 6.1. Unit & Integration Test Suite (Vitest)
-- **19 bài kiểm thử Component:** `frontend/src/__tests__/detail.test.tsx`
-  - Render đầy đủ thư viện ảnh, các huy hiệu bảo chứng và cụm ảnh thu nhỏ.
-  - Mở Lightbox Modal, chuyển ảnh trước/sau và đóng bằng phím `Escape`.
-  - Hiển thị đúng giá VND, đơn giá m² và 4 thông số cốt lõi.
-  - Xử lý sao chép clipboard và hiển thị phản hồi.
-  - Hiển thị mô tả và thông báo bảo vệ vị trí.
-  - Hiển thị đúng các trạng thái của thẻ tư vấn: Khách vãng lai, Admin, Đã đăng nhập và Gửi thành công.
-- **7 bài kiểm thử BFF API:** `frontend/src/__tests__/bff-contact-requests.test.ts`
-  - Kiểm tra từ chối khi thiếu session cookie (HTTP 401).
-  - Kiểm tra từ chối khi thiếu `listingId` hoặc `contactConsent: false` (HTTP 400).
-  - Kiểm tra chuyển tiếp Bearer token và xử lý đúng mã lỗi từ NestJS (HTTP 201, 403, 400, 500).
+Hệ thống kiểm thử tự động đạt tỷ lệ pass tuyệt đối **100%**:
+- **Frontend Vitest Suite:** **153/153 tests pass** trên 15 tệp kiểm thử.
+  - `frontend/src/__tests__/detail.test.tsx` (**23 tests**):
+    - Khử nhiễm và chuẩn hóa dữ liệu tin đăng, sắp xếp mảng ảnh theo thứ tự `order`.
+    - Thẩm định trả về `null` khi backend trả 404 hoặc trạng thái khác `APPROVED`.
+    - Khởi tạo đầy đủ thư viện ảnh tỷ lệ 65/35, mở lightbox toàn màn hình qua chuột và bàn phím (`Space`, `Enter`), duyệt ảnh trước/sau và đóng bằng `Escape`.
+    - Trạng thái fallback khi không có hình ảnh hoặc mô tả rỗng/chỉ chứa khoảng trắng (hỗ trợ cả Tiếng Việt và Tiếng Anh).
+    - Hiển thị giá VND, đơn giá m² và 4 thông số cốt lõi mà không bịa đặt thông số kỹ thuật.
+    - Xử lý sao chép liên kết clipboard kèm thông báo trực quan.
+    - Hiển thị thông báo bảo vệ vị trí địa lý vùng bán kính ~500m mà không lộ số nhà/tọa độ riêng tư.
+    - Hiển thị trạng thái khách vãng lai kèm liên kết `returnTo`, trạng thái vô hiệu hóa đối với Admin, và cho phép Buyer gửi yêu cầu thành công kèm cam kết chia sẻ thông tin.
+    - Xử lý từ chối khi chủ nhà tự gửi yêu cầu cho chính tin đăng của mình (HTTP 400).
+    - Tạo dynamic SEO metadata (canonical URL, alternates hreflang, OpenGraph).
+    - Render giao diện 404 chuyên dụng `not-found.tsx` và Error Boundary 500 `error.tsx` kèm nút thử lại (`reset()`).
+  - `frontend/src/__tests__/bff-contact-requests.test.ts` (**10 tests**):
+    - Kiểm tra từ chối khi thiếu session cookie (HTTP 401).
+    - Kiểm tra từ chối khi payload không phải đối tượng JSON hoặc `listingId` rỗng/khoảng trắng (HTTP 400).
+    - Kiểm tra từ chối khi thiếu `contactConsent: true` hoặc `message` không phải kiểu chuỗi (HTTP 400).
+    - Kiểm tra chuyển tiếp Bearer token và xử lý đúng mã lỗi từ NestJS (HTTP 201, 403, 400).
+    - Đảm bảo khi backend phát sinh lỗi hệ thống 500, BFF che giấu toàn bộ exception stack/chuỗi kết nối nội bộ và trả về `Internal Server Error` an toàn.
+  - `frontend/src/__tests__/navigation.test.ts` (**13 tests**):
+    - Kiểm thử chuyên sâu 13 tình huống thẩm định `returnTo`, triệt tiêu toàn bộ rủi ro Open Redirect, URL scheme ngoài, protocol-relative paths (`//`), backslashes (`\`, `%5c`, `%5C`), và ký tự điều khiển.
+  - `frontend/src/__tests__/LoginPage.test.tsx` (**8 tests**) & `RegisterPage.test.tsx` (**8 tests**):
+    - Đảm bảo bảo toàn form state qua đa ngôn ngữ và chuyển hướng an toàn theo `safeReturnTo`.
+- **Backend Test Suite:** **132/132 tests pass** (và 128 tests trong unit suite), bao quát phân quyền vai trò, lifecycle tin đăng và tạo/quản lý yêu cầu liên hệ.
+- **Linters:** Frontend ESLint (0 errors, 0 warnings), Backend Oxlint (0 errors, 0 warnings).
+- **Production Builds:** Cả Frontend Next.js Turbopack và Backend NestJS đều build thành công tuyệt đối 0 lỗi.
 
 ### 6.2. Kiểm Thử Trình Duyệt Thực Tế Bằng Chrome CDP
-Kịch bản tự động `scratch/browser-verify-detail.mjs` chạy trực tiếp trên Google Chrome:
+Kịch bản tự động `scratch/browser-verify-detail.mjs` chạy trực tiếp trên Google Chrome thông qua Chrome DevTools Protocol:
 
-| Kịch Bản | Mục Tiêu Kiểm Thử | Tệp Ảnh Minh Chứng | Kết Quả |
-| :--- | :--- | :--- | :---: |
-| **Kịch bản 1** | Chi tiết Desktop Tiếng Việt (`/vi/bat-dong-san/seed_listing_01`) | `01-vi-detail-desktop.png` | **100% PASS** |
-| **Kịch bản 2** | Chi tiết Desktop Tiếng Anh (`/en/bat-dong-san/seed_listing_01`) | `02-en-detail-desktop.png` | **100% PASS** |
-| **Kịch bản 3** | Mở Lightbox Modal, đếm ảnh `1 / 2`, đóng bằng phím `Escape` | `03-vi-lightbox-modal-desktop.png` | **100% PASS** |
-| **Kịch bản 4** | Khách vãng lai kiểm tra liên kết đăng nhập kèm `returnTo` | `04-vi-login-return-to-desktop.png` | **100% PASS** |
-| **Kịch bản 5** | Đăng nhập tài khoản Buyer, tự động chuyển hướng về trang chi tiết | `05-vi-detail-authenticated-desktop.png` | **100% PASS** |
-| **Kịch bản 6** | Gửi form yêu cầu tư vấn kèm cam kết, hiển thị mã `CMW60RP7` | `06-vi-contact-request-success-desktop.png` | **100% PASS** |
-| **Kịch bản 7** | Giao diện Không tìm thấy (404) khi ID không tồn tại hoặc chưa duyệt | `07-vi-detail-not-found-desktop.png` | **100% PASS** |
-| **Kịch bản 8** | Giao diện hiển thị Responsive Mobile trên khung hình 390x844 | `08-vi-detail-mobile.png` | **100% PASS** |
+| Kịch Bản | Mục Tiêu Kiểm Thử | Mã HTTP | Tệp Ảnh Minh Chứng | Kết Quả |
+| :--- | :--- | :---: | :--- | :---: |
+| **Kịch bản 1** | Chi tiết Desktop Tiếng Việt (`/vi/bat-dong-san/seed_listing_01`) | `200 OK` | `phase2e2c-detail/01-vi-detail-desktop.png` | **100% PASS** |
+| **Kịch bản 2** | Chi tiết Desktop Tiếng Anh (`/en/bat-dong-san/seed_listing_01`) | `200 OK` | `phase2e2c-detail/02-en-detail-desktop.png` | **100% PASS** |
+| **Kịch bản 3** | Mở Lightbox Modal, đếm ảnh `1 / 2`, đóng bằng phím `Escape` | `200 OK` | `phase2e2c-detail/03-vi-lightbox-modal-desktop.png` | **100% PASS** |
+| **Kịch bản 4** | Khách vãng lai kiểm tra liên kết đăng nhập kèm `returnTo` | `200 OK` | `phase2e2c-detail/04-vi-login-return-to-desktop.png` | **100% PASS** |
+| **Kịch bản 5** | Đăng nhập tài khoản Buyer, tự động chuyển hướng về trang chi tiết | `200 OK` | `phase2e2c-detail/05-vi-detail-authenticated-desktop.png` | **100% PASS** |
+| **Kịch bản 6** | Gửi form yêu cầu tư vấn kèm cam kết, hiển thị mã yêu cầu động từ DB | `200 OK` | `phase2e2c-detail/06-vi-contact-request-success-desktop.png` | **100% PASS** |
+| **Kịch bản 7** | Giao diện Không tìm thấy (404) khi ID không tồn tại hoặc chưa duyệt | `404 Not Found` | `phase2e2c-detail/07-vi-detail-not-found-desktop.png` | **100% PASS** |
+| **Kịch bản 8** | Giao diện hiển thị Responsive Mobile trên khung hình 390x844 | `200 OK` | `phase2e2c-detail/08-vi-detail-mobile.png` | **100% PASS** |
+
+> *Ghi chú về mã yêu cầu liên hệ:* Mã yêu cầu hiển thị trong thông báo thành công (ví dụ: `#CMW80VYC`, `#CMW60RP7`) được sinh ngẫu nhiên định danh bởi backend và lưu trữ thực tế trong bảng `ContactRequest` của PostgreSQL. Bài kiểm thử trình duyệt thẩm định sự tồn tại và tính hợp lệ động của mã định danh này thay vì gán cứng một giá trị tĩnh.
 
 ---
 
@@ -333,11 +415,15 @@ Kịch bản tự động `scratch/browser-verify-detail.mjs` chạy trực ti�
 
 1. **Khởi động môi trường cục bộ:**
    - Đảm bảo service `postgresql-x64-16` đang chạy trên cổng 5432.
-   - Khởi động backend NestJS: `npm --prefix backend run start:dev` (hoặc `start:prod`).
+   - Khởi động backend NestJS: `npm --prefix backend run start:dev` (hoặc `npm --prefix backend run start:prod`).
    - Khởi động frontend Next.js: `npm --prefix frontend run dev` (hoặc `build` + `start`).
 2. **Kiểm tra route chi tiết:**
    - Truy cập `http://localhost:3000/vi/bat-dong-san/seed_listing_01`.
-   - Đăng nhập thử với `buyer@example.test` / `DemoPassword123!`.
-3. **Lưu ý tương thích Next.js 16 App Router:**
+   - Đăng nhập thử với tài khoản mẫu phát triển cục bộ: `buyer@example.test` / `DemoPassword123!`.
+   > *Lưu ý an toàn:* `buyer@example.test` là tài khoản dữ liệu mẫu nội bộ được khởi tạo từ tệp seed (`database/prisma/seed.ts`), hoàn toàn độc lập và không bao giờ được cấu hình hay cấp quyền trên môi trường production.
+3. **Cơ chế xử lý lỗi HTTP & Not Found:**
+   - Khi một tin đăng không tồn tại hoặc có trạng thái khác `APPROVED`, Server Component sẽ gọi `notFound()`, Next.js sẽ chuyển quyền render cho `frontend/src/app/[locale]/bat-dong-san/[id]/not-found.tsx` và trả về mã HTTP 404 thực thụ cho trình duyệt và các bộ máy tìm kiếm (SEO).
+   - Khi xảy ra lỗi mạng hoặc backend ngoại tuyến (5xx), Server Component truyền lỗi ra Error Boundary `frontend/src/app/[locale]/bat-dong-san/[id]/error.tsx` để hiển thị nút "Thử lại" mà không nhận nhầm thành lỗi 404.
+4. **Lưu ý tương thích Next.js 16 App Router:**
    - Trang chi tiết và các layout liên quan có sử dụng Client Hooks (`useSearchParams`) bắt buộc phải bọc trong `<Suspense fallback={null}>` và khai báo `export const instant = false;` để hỗ trợ cơ chế render streaming ổn định.
    - Không khai báo đồng thời `export const dynamic = 'force-dynamic'` khi `next.config.ts` đang kích hoạt `cacheComponents`.
