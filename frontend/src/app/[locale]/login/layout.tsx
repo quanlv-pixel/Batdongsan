@@ -1,6 +1,8 @@
-import React from 'react';
+import React, { Suspense } from 'react';
 import type { Metadata } from 'next';
 import { buildLocalizedPageMetadata } from '@/i18n/metadata';
+
+export const instant = false;
 
 export async function generateMetadata({
   params,
@@ -16,5 +18,5 @@ export default function LoginLayout({
 }: {
   children: React.ReactNode;
 }) {
-  return children;
+  return <Suspense fallback={null}>{children}</Suspense>;
 }

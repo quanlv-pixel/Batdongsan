@@ -126,3 +126,65 @@ export async function fetchPublicListings(
     },
   };
 }
+
+
+/**
+ * Fetches single public APPROVED listing detail from the NestJS backend (`GET /api/listings/:id`).
+ * Uses `getBackendBaseUrl()` and `cache: 'no-store'`.
+ * Returns null if the listing does not exist or is not APPROVED (404),
+ * ensuring unapproved or draft records are never exposed.
+ */
+export async function fetchPublicListingDetail(
+  id: string,
+): Promise<PublicListingSummary | null> {
+  if (!id || typeof id !== 'string' || !id.trim()) {
+    return null;
+  }
+
+  const baseUrl = getBackendBaseUrl();
+  const url = `${baseUrl}/api/listings/${encodeURIComponent(id.trim())}`;
+
+  let response: Response;
+  try {
+    response = await fetch(url, {
+      method: 'GET',
+      headers: {
+        Accept: 'application/json',
+      },
+      cache: 'no-store',
+    });
+  } catch (err: unknown) {
+    const message =
+      err instanceof Error
+        ? err.message
+        : 'Không thể kết nối đến máy chủ bất động sản.';
+    throw new ApiClientError(500, message, 'Network Error');
+  }
+
+  if (response.status === 404) {
+    return null;
+  }
+
+  if (!response.ok) {
+    let errorMessage =
+      'Không thể tải chi tiết bất động sản. Vui lòng thử lại sau.';
+    try {
+      const errorBody = (await response.json()) as { message?: string | string[] };
+      if (errorBody?.message) {
+        errorMessage = Array.isArray(errorBody.message)
+          ? errorBody.message.join(', ')
+          : errorBody.message;
+      }
+    } catch {
+      // keep default error message
+    }
+    throw new ApiClientError(response.status, errorMessage);
+  }
+
+  const rawItem = (await response.json()) as PublicListingSummary;
+  if (!rawItem || rawItem.status !== 'APPROVED') {
+    return null;
+  }
+
+  return sanitizePublicListing(rawItem);
+}

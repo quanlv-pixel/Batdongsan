@@ -4,6 +4,8 @@ import {
   LoginResponse,
   RegisterRequest,
   RegisterResponse,
+  CreateContactRequestInput,
+  ContactRequestResponse,
 } from '@/types';
 
 export class ApiClientError extends Error {
@@ -137,6 +139,15 @@ class ApiClient {
   public async getMe(): Promise<CurrentUserResponse> {
     return this.request<CurrentUserResponse>('/api/auth/me', {
       method: 'GET',
+    });
+  }
+
+  public async createContactRequest(
+    data: CreateContactRequestInput,
+  ): Promise<ContactRequestResponse> {
+    return this.request<ContactRequestResponse>('/api/contact-requests', {
+      method: 'POST',
+      body: JSON.stringify(data),
     });
   }
 

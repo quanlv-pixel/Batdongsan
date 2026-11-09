@@ -3,15 +3,19 @@
 import React, { useState } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { useAuth } from '@/context/AuthContext';
 import { RegistrationIntent } from '@/types';
 import { ApiClientError } from '@/lib/api-client';
 import { useDictionary, useLocalizedHref } from '@/i18n';
 import { LanguageSwitcher } from '@/components/common/LanguageSwitcher';
+import { sanitizeReturnTo } from '@/lib/navigation';
 
 export default function RegisterPage() {
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const rawReturnTo = searchParams?.get('returnTo') ?? null;
+  const safeReturnTo = sanitizeReturnTo(rawReturnTo);
   const { register } = useAuth();
   const dict = useDictionary();
   const localizeHref = useLocalizedHref();
@@ -71,7 +75,14 @@ export default function RegisterPage() {
       setSuccessMessage(dict.RegisterPage.successMessage);
 
       setTimeout(() => {
-        router.push(localizeHref('/login'));
+        router.push(
+          localizeHref(
+            '/login' +
+              (safeReturnTo
+                ? `?returnTo=${encodeURIComponent(safeReturnTo)}`
+                : ''),
+          ),
+        );
       }, 1500);
     } catch (err: unknown) {
       if (err instanceof ApiClientError) {
@@ -581,7 +592,12 @@ export default function RegisterPage() {
                   {dict.RegisterPage.hasAccountPrompt}{' '}
                   <Link
                     className="text-[#0F766E] font-semibold hover:underline ml-1"
-                    href={localizeHref('/login')}
+                    href={localizeHref(
+                      '/login' +
+                        (safeReturnTo
+                          ? `?returnTo=${encodeURIComponent(safeReturnTo)}`
+                          : ''),
+                    )}
                   >
                     {dict.RegisterPage.signInLink}
                   </Link>

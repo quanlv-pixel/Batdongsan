@@ -5,17 +5,23 @@ import LoginPage from '@/app/[locale]/login/page';
 import * as AuthContextModule from '@/context/AuthContext';
 import { ApiClientError } from '@/lib/api-client';
 
-const mockPush = vi.fn();
+const { mockPush, mockSearchParamsRef } = vi.hoisted(() => ({
+  mockPush: vi.fn(),
+  mockSearchParamsRef: { current: new URLSearchParams() },
+}));
+
 vi.mock('next/navigation', () => ({
   useRouter: () => ({
     push: mockPush,
   }),
+  useSearchParams: () => mockSearchParamsRef.current,
 }));
 
 describe('LoginPage Component Tests', () => {
   beforeEach(() => {
     vi.restoreAllMocks();
     mockPush.mockReset();
+    mockSearchParamsRef.current = new URLSearchParams();
   });
 
   afterEach(() => {
@@ -204,5 +210,63 @@ describe('LoginPage Component Tests', () => {
       password: 'password123',
       rememberMe: true,
     });
+  });
+
+  it('7. Safe returnTo parameter redirects to intended internal target after login', async () => {
+    mockSearchParamsRef.current = new URLSearchParams('returnTo=%2Fvi%2Fbat-dong-san%2Fseed_listing_01%3Fsource%3Dsearch');
+    const mockLogin = vi.fn().mockResolvedValue({ id: 'usr_1', role: 'BUYER' });
+    vi.spyOn(AuthContextModule, 'useAuth').mockReturnValue({
+      user: null,
+      isAuthenticated: false,
+      isLoading: false,
+      login: mockLogin,
+      register: vi.fn(),
+      logout: vi.fn(),
+      refreshUser: vi.fn(),
+    });
+
+    render(<LoginPage />);
+
+    fireEvent.change(screen.getByPlaceholderText('Nhập địa chỉ email của bạn'), {
+      target: { value: 'buyer@test.com' },
+    });
+    fireEvent.change(screen.getByPlaceholderText('Nhập mật khẩu'), {
+      target: { value: 'password123' },
+    });
+
+    await act(async () => {
+      fireEvent.click(screen.getByRole('button', { name: /Đăng nhập/i }));
+    });
+
+    expect(mockPush).toHaveBeenCalledWith('/vi/bat-dong-san/seed_listing_01?source=search');
+  });
+
+  it('8. Unsafe returnTo (open redirect attempt) is rejected and falls back to home page', async () => {
+    mockSearchParamsRef.current = new URLSearchParams('returnTo=%2F%5C%5Cevil.example');
+    const mockLogin = vi.fn().mockResolvedValue({ id: 'usr_1', role: 'BUYER' });
+    vi.spyOn(AuthContextModule, 'useAuth').mockReturnValue({
+      user: null,
+      isAuthenticated: false,
+      isLoading: false,
+      login: mockLogin,
+      register: vi.fn(),
+      logout: vi.fn(),
+      refreshUser: vi.fn(),
+    });
+
+    render(<LoginPage />);
+
+    fireEvent.change(screen.getByPlaceholderText('Nhập địa chỉ email của bạn'), {
+      target: { value: 'buyer@test.com' },
+    });
+    fireEvent.change(screen.getByPlaceholderText('Nhập mật khẩu'), {
+      target: { value: 'password123' },
+    });
+
+    await act(async () => {
+      fireEvent.click(screen.getByRole('button', { name: /Đăng nhập/i }));
+    });
+
+    expect(mockPush).toHaveBeenCalledWith('/');
   });
 });

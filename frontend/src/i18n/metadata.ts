@@ -120,3 +120,63 @@ export function buildLocalizedPageMetadata(
     },
   };
 }
+
+
+export function buildLocalizedListingDetailMetadata(
+  rawLocale: string,
+  listingId: string,
+  listing: { title: string; description: string; images?: { url: string }[] } | null,
+  env: Record<string, string | undefined> = process.env,
+): Metadata {
+  const locale: AppLocale = resolveLocale(rawLocale);
+  const dict = getDictionary(locale);
+  const siteBaseUrl = getSiteBaseUrl(env);
+
+  const suffix = `/bat-dong-san/${listingId}`;
+  const canonicalPath = resolveMetadataUrl(`/${locale}${suffix}`, siteBaseUrl);
+  const viPath = resolveMetadataUrl(`/vi${suffix}`, siteBaseUrl);
+  const enPath = resolveMetadataUrl(`/en${suffix}`, siteBaseUrl);
+
+  const title = listing
+    ? `${listing.title} | Batdongsan`
+    : dict.Metadata.detailNotFoundTitle;
+
+  const description = listing
+    ? listing.description?.trim().slice(0, 160) || dict.Metadata.detailDescription
+    : dict.PropertyDetail.states.notFoundDescription;
+
+  const ogImages = listing?.images?.[0]?.url
+    ? [
+        {
+          url: listing.images[0].url,
+          width: 1200,
+          height: 630,
+          alt: listing.title,
+        },
+      ]
+    : undefined;
+
+  return {
+    ...(siteBaseUrl ? { metadataBase: siteBaseUrl } : {}),
+    title,
+    description,
+    alternates: {
+      canonical: canonicalPath,
+      languages: {
+        vi: viPath,
+        en: enPath,
+        'x-default': viPath,
+      },
+    },
+    openGraph: {
+      title,
+      description,
+      url: canonicalPath,
+      siteName: 'Batdongsan',
+      locale: locale === 'en' ? 'en_US' : 'vi_VN',
+      alternateLocale: locale === 'en' ? ['vi_VN'] : ['en_US'],
+      type: 'article',
+      ...(ogImages ? { images: ogImages } : {}),
+    },
+  };
+}

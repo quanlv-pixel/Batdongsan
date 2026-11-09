@@ -136,3 +136,20 @@ export interface PublicListingsQuery {
   minArea?: number;
   maxArea?: number;
 }
+
+export interface CreateContactRequestInput {
+  listingId: string;
+  message?: string;
+  contactConsent: boolean;
+}
+
+export interface ContactRequestResponse {
+  id: string;
+  listingId: string;
+  buyerId: string;
+  message: string | null;
+  contactConsent: boolean;
+  status: ContactRequestStatus;
+  createdAt: string;
+  assignedAgentId: string | null;
+}
