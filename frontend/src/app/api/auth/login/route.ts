@@ -71,13 +71,12 @@ export async function POST(request: Request) {
 
     // Return user info only — never expose raw JWT to browser JavaScript
     return NextResponse.json({ user }, { status: 200 });
-  } catch (error: unknown) {
-    const errorMsg = error instanceof Error ? error.message : 'Internal Server Error';
+  } catch {
     return NextResponse.json(
       {
         statusCode: 500,
         message: 'Không thể kết nối đến máy chủ xác thực. Vui lòng thử lại sau.',
-        error: errorMsg,
+        error: 'Internal Server Error',
       },
       { status: 500 },
     );

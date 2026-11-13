@@ -404,18 +404,20 @@ export function MyListingsTab({ userRole, locale: propLocale }: MyListingsTabPro
       />
 
       {/* Grant MLS Share Modal */}
-      <GrantMlsModal
-        isOpen={isShareModalOpen}
-        onClose={() => {
-          setIsShareModalOpen(false);
-          setShareTargetListingId(undefined);
-        }}
-        approvedListings={approvedListings}
-        preselectedListingId={shareTargetListingId}
-        onSuccess={() => {
-          setActionNotice('Đã cấp quyền chia sẻ MLS thành công!');
-        }}
-      />
+      {isShareModalOpen && (
+        <GrantMlsModal
+          isOpen={isShareModalOpen}
+          onClose={() => {
+            setIsShareModalOpen(false);
+            setShareTargetListingId(undefined);
+          }}
+          approvedListings={approvedListings}
+          preselectedListingId={shareTargetListingId}
+          onSuccess={() => {
+            setActionNotice('Đã cấp quyền chia sẻ MLS thành công!');
+          }}
+        />
+      )}
     </div>
   );
 }
