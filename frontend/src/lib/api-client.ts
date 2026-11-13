@@ -6,6 +6,15 @@ import {
   RegisterResponse,
   CreateContactRequestInput,
   ContactRequestResponse,
+  MyListingsResponse,
+  CreateListingInput,
+  MyListingItem,
+  AssignedLeadsResponse,
+  ContactRequestStatus,
+  InquiriesResponse,
+  ReceivedMlsSharesResponse,
+  GrantMlsShareInput,
+  ReceivedMlsShareItem,
 } from '@/types';
 
 export class ApiClientError extends Error {
@@ -155,6 +164,143 @@ class ApiClient {
     return this.request<{ success: boolean; message: string }>('/api/auth/logout', {
       method: 'POST',
     });
+  }
+
+  // ── Workspace: Listings Endpoints (BFF) ─────────────────────
+
+  public async getMyListings(params?: {
+    status?: string;
+    page?: number;
+    limit?: number;
+  }): Promise<MyListingsResponse> {
+    const query = new URLSearchParams();
+    if (params?.status) query.set('status', params.status);
+    if (params?.page) query.set('page', String(params.page));
+    if (params?.limit) query.set('limit', String(params.limit));
+    const qs = query.toString();
+    return this.request<MyListingsResponse>(`/api/listings/mine${qs ? `?${qs}` : ''}`, {
+      method: 'GET',
+    });
+  }
+
+  public async createListing(
+    data: CreateListingInput,
+  ): Promise<MyListingItem> {
+    return this.request<MyListingItem>('/api/listings', {
+      method: 'POST',
+      body: JSON.stringify(data),
+    });
+  }
+
+  public async submitListing(
+    id: string,
+  ): Promise<{ id: string; status: string; message: string }> {
+    return this.request<{ id: string; status: string; message: string }>(
+      `/api/listings/${encodeURIComponent(id)}/submit`,
+      {
+        method: 'POST',
+      },
+    );
+  }
+
+  // ── Workspace: Contact Requests & Leads (BFF) ───────────────
+
+  public async getAssignedContactRequests(params?: {
+    status?: string;
+    page?: number;
+    limit?: number;
+  }): Promise<AssignedLeadsResponse> {
+    const query = new URLSearchParams();
+    if (params?.status) query.set('status', params.status);
+    if (params?.page) query.set('page', String(params.page));
+    if (params?.limit) query.set('limit', String(params.limit));
+    const qs = query.toString();
+    return this.request<AssignedLeadsResponse>(
+      `/api/contact-requests/assigned${qs ? `?${qs}` : ''}`,
+      {
+        method: 'GET',
+      },
+    );
+  }
+
+  public async updateContactRequestStatus(
+    id: string,
+    status: ContactRequestStatus,
+    note?: string,
+  ): Promise<ContactRequestResponse> {
+    return this.request<ContactRequestResponse>(
+      `/api/contact-requests/${encodeURIComponent(id)}/status`,
+      {
+        method: 'PATCH',
+        body: JSON.stringify({ status, note }),
+      },
+    );
+  }
+
+  public async getInquiriesForOwnedListings(params?: {
+    status?: string;
+    page?: number;
+    limit?: number;
+  }): Promise<InquiriesResponse> {
+    const query = new URLSearchParams();
+    if (params?.status) query.set('status', params.status);
+    if (params?.page) query.set('page', String(params.page));
+    if (params?.limit) query.set('limit', String(params.limit));
+    const qs = query.toString();
+    return this.request<InquiriesResponse>(
+      `/api/contact-requests/for-owned-listings${qs ? `?${qs}` : ''}`,
+      {
+        method: 'GET',
+      },
+    );
+  }
+
+  // ── Workspace: MLS Collaboration Endpoints (BFF) ───────────
+
+  public async getReceivedMlsShares(params?: {
+    page?: number;
+    limit?: number;
+    province?: string;
+    district?: string;
+    propertyType?: string;
+    transactionType?: string;
+  }): Promise<ReceivedMlsSharesResponse> {
+    const query = new URLSearchParams();
+    if (params?.page) query.set('page', String(params.page));
+    if (params?.limit) query.set('limit', String(params.limit));
+    if (params?.province) query.set('province', params.province);
+    if (params?.district) query.set('district', params.district);
+    if (params?.propertyType) query.set('propertyType', params.propertyType);
+    if (params?.transactionType) query.set('transactionType', params.transactionType);
+    const qs = query.toString();
+    return this.request<ReceivedMlsSharesResponse>(
+      `/api/mls/shares/received${qs ? `?${qs}` : ''}`,
+      {
+        method: 'GET',
+      },
+    );
+  }
+
+  public async grantMlsShare(
+    data: GrantMlsShareInput,
+  ): Promise<ReceivedMlsShareItem> {
+    return this.request<ReceivedMlsShareItem>('/api/mls/shares', {
+      method: 'POST',
+      body: JSON.stringify(data),
+    });
+  }
+
+  public async revokeMlsShare(
+    shareId: string,
+    reason?: string,
+  ): Promise<{ id: string; isActive: boolean; message?: string }> {
+    return this.request<{ id: string; isActive: boolean; message?: string }>(
+      `/api/mls/shares/${encodeURIComponent(shareId)}/revoke`,
+      {
+        method: 'POST',
+        body: JSON.stringify({ reason }),
+      },
+    );
   }
 }
 

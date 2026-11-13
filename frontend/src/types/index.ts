@@ -153,3 +153,5 @@ export interface ContactRequestResponse {
   createdAt: string;
   assignedAgentId: string | null;
 }
+
+export * from './workspace';
