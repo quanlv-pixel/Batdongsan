@@ -15,6 +15,7 @@ import { GrantMlsShareDto } from './dto/grant-mls-share.dto.js';
 import { RevokeMlsShareDto } from './dto/revoke-mls-share.dto.js';
 import { QueryReceivedMlsSharesDto } from './dto/query-received-mls-shares.dto.js';
 import { QueryMlsShareHistoryDto } from './dto/query-mls-share-history.dto.js';
+import { QueryAdminMlsSharesDto } from './dto/query-admin-mls-shares.dto.js';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard.js';
 import { RolesGuard } from '../auth/guards/roles.guard.js';
 import { Roles } from '../auth/decorators/roles.decorator.js';
@@ -82,6 +83,18 @@ export class MlsController {
     @Query() query: QueryReceivedMlsSharesDto,
   ) {
     return this.mlsService.getReceivedShares(agentId, query);
+  }
+
+  /**
+   * GET /api/mls/admin/shares
+   * ADMIN only: View all MLS shares across all listings.
+   * Registered before parameterized routes.
+   */
+  @Get(['admin/shares', 'shares/admin'])
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(Role.ADMIN)
+  async getAdminMlsShares(@Query() query: QueryAdminMlsSharesDto) {
+    return this.mlsService.getAdminMlsShares(query);
   }
 
   /**

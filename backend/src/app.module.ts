@@ -6,9 +6,10 @@ import { AuthModule } from './auth/auth.module.js';
 import { ListingsModule } from './listings/listings.module.js';
 import { MlsModule } from './mls/mls.module.js';
 import { ContactRequestsModule } from './contact-requests/contact-requests.module.js';
+import { UsersModule } from './users/users.module.js';
 
 @Module({
-  imports: [PrismaModule, AuthModule, ListingsModule, MlsModule, ContactRequestsModule],
+  imports: [PrismaModule, AuthModule, ListingsModule, MlsModule, ContactRequestsModule, UsersModule],
   controllers: [AppController],
   providers: [AppService],
 })
