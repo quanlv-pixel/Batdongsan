@@ -33,13 +33,12 @@ export async function POST(request: Request) {
     const data = await response.json();
 
     return NextResponse.json(data, { status: response.status });
-  } catch (error: unknown) {
-    const errorMsg = error instanceof Error ? error.message : 'Internal Server Error';
+  } catch {
     return NextResponse.json(
       {
         statusCode: 500,
         message: 'Không thể kết nối đến máy chủ đăng ký. Vui lòng thử lại sau.',
-        error: errorMsg,
+        error: 'Internal Server Error',
       },
       { status: 500 },
     );

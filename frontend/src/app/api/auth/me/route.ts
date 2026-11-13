@@ -38,13 +38,12 @@ export async function GET() {
     }
 
     return NextResponse.json({ user: data }, { status: 200 });
-  } catch (error: unknown) {
-    const errorMsg = error instanceof Error ? error.message : 'Internal Server Error';
+  } catch {
     return NextResponse.json(
       {
         statusCode: 500,
         message: 'Lỗi xác thực người dùng. Vui lòng thử lại sau.',
-        error: errorMsg,
+        error: 'Internal Server Error',
       },
       { status: 500 },
     );

@@ -42,6 +42,18 @@ describe('Contact Requests & Agent Assignments HTTP Integration Tests (Real Post
   const createdAssignmentIds: string[] = [];
   const createdUserIds: string[] = [];
 
+  const getAgentTokenById = (agentId: string): string => {
+    if (agentId === 'seed_user_agent_a') return agentAToken;
+    if (agentId === 'seed_user_agent_b') return agentBToken;
+    if (agentId === createdUserIds[1]) return agentOwnerToken;
+    throw new Error(`Unexpected assigned agentId: ${agentId}`);
+  };
+
+  const getUnassignedAgentToken = (assignedId: string): string => {
+    if (assignedId !== 'seed_user_agent_a') return agentAToken;
+    return agentBToken;
+  };
+
   let testListingApprovedId: string;
   let testListingDraftId: string;
   let testListingAgentOwnedId: string;
@@ -543,7 +555,7 @@ describe('Contact Requests & Agent Assignments HTTP Integration Tests (Real Post
     });
 
     it('Active assigned Agent receives details including buyer contact when consent is true', async () => {
-      const targetToken = assignedAgentId === 'seed_user_agent_a' ? agentAToken : agentBToken;
+      const targetToken = getAgentTokenById(assignedAgentId);
 
       const res = await request(app.getHttpServer())
         .get(`/api/contact-requests/${testReqId}`)
@@ -564,7 +576,7 @@ describe('Contact Requests & Agent Assignments HTTP Integration Tests (Real Post
         data: { contactConsent: false },
       });
 
-      const targetToken = assignedAgentId === 'seed_user_agent_a' ? agentAToken : agentBToken;
+      const targetToken = getAgentTokenById(assignedAgentId);
 
       const res = await request(app.getHttpServer())
         .get(`/api/contact-requests/${testReqId}`)
@@ -640,6 +652,7 @@ describe('Contact Requests & Agent Assignments HTTP Integration Tests (Real Post
 
   describe('6. PATCH /api/contact-requests/:id/status (State Machine)', () => {
     let testReqId: string;
+    let assignedAgentIdForStatus: string;
     let assignedToken: string;
 
     beforeAll(async () => {
@@ -653,8 +666,9 @@ describe('Contact Requests & Agent Assignments HTTP Integration Tests (Real Post
         .expect(201);
 
       testReqId = res.body.id;
+      assignedAgentIdForStatus = res.body.assignedAgentId;
       createdRequestIds.push(res.body.id);
-      assignedToken = res.body.assignedAgentId === 'seed_user_agent_a' ? agentAToken : agentBToken;
+      assignedToken = getAgentTokenById(assignedAgentIdForStatus);
 
       const assign = await prisma.requestAssignment.findFirst({
         where: { contactRequestId: res.body.id, isActive: true },
@@ -698,7 +712,7 @@ describe('Contact Requests & Agent Assignments HTTP Integration Tests (Real Post
     it('Unassigned/different agent receives 403 Forbidden when attempting status update', async () => {
       await request(app.getHttpServer())
         .patch(`/api/contact-requests/${testReqId}/status`)
-        .set('Authorization', `Bearer ${agentOwnerToken}`)
+        .set('Authorization', `Bearer ${getUnassignedAgentToken(assignedAgentIdForStatus)}`)
         .send({
           status: ContactRequestStatus.IN_PROGRESS,
         })
@@ -712,7 +726,7 @@ describe('Contact Requests & Agent Assignments HTTP Integration Tests (Real Post
         .send({ listingId: testListingApprovedId, contactConsent: true })
         .expect(201);
       createdRequestIds.push(res.body.id);
-      const token = res.body.assignedAgentId === 'seed_user_agent_a' ? agentAToken : agentBToken;
+      const token = getAgentTokenById(res.body.assignedAgentId);
 
       const assign = await prisma.requestAssignment.findFirst({
         where: { contactRequestId: res.body.id, isActive: true },
@@ -835,7 +849,7 @@ describe('Contact Requests & Agent Assignments HTTP Integration Tests (Real Post
         .send({ listingId: testListingApprovedId, contactConsent: true })
         .expect(201);
       createdRequestIds.push(res.body.id);
-      const token = res.body.assignedAgentId === 'seed_user_agent_a' ? agentAToken : agentBToken;
+      const token = getAgentTokenById(res.body.assignedAgentId);
 
       const assign = await prisma.requestAssignment.findFirst({
         where: { contactRequestId: res.body.id, isActive: true },
@@ -936,12 +950,11 @@ describe('Contact Requests & Agent Assignments HTTP Integration Tests (Real Post
       });
       if (assign) createdAssignmentIds.push(assign.id);
 
+      oldAgentToken = getAgentTokenById(res.body.assignedAgentId);
       if (res.body.assignedAgentId === 'seed_user_agent_a') {
-        oldAgentToken = agentAToken;
         newAgentToken = agentBToken;
         newAgentId = 'seed_user_agent_b';
       } else {
-        oldAgentToken = agentBToken;
         newAgentToken = agentAToken;
         newAgentId = 'seed_user_agent_a';
       }

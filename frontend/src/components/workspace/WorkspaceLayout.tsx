@@ -198,7 +198,9 @@ export function WorkspaceLayout({ user, locale }: WorkspaceLayoutProps) {
 
         {/* Tab Content Panel */}
         <div className="bg-white rounded-2xl border border-neutral-200 p-6 shadow-sm">
-          {activeTab === 'my-listings' && <MyListingsTab locale={locale} />}
+          {activeTab === 'my-listings' && (
+            <MyListingsTab userRole={user.role} locale={locale} />
+          )}
           {activeTab === 'leads' && <AssignedLeadsTab locale={locale} />}
           {activeTab === 'mls' && <MlsTab locale={locale} />}
           {activeTab === 'inquiries' && <InquiriesTab locale={locale} />}
