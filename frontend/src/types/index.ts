@@ -156,3 +156,4 @@ export interface ContactRequestResponse {
 
 export * from './workspace';
 export * from './admin';
+export * from './assistant';

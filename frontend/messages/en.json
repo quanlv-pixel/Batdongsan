@@ -797,5 +797,28 @@
       "expiresAt": "Expires At",
       "unlimited": "Unlimited"
     }
+  },
+  "AiAssistant": {
+    "launcherLabel": "AI Property Assistant",
+    "launcherAriaLabel": "Open AI Property Assistant",
+    "title": "AI Property Assistant",
+    "subtitle": "Grounded in approved listings",
+    "closeLabel": "Close assistant",
+    "clearLabel": "Clear conversation",
+    "disclaimer": "Recommendations are grounded in approved listings on Batdongsan; information is for reference only.",
+    "welcomeMessage": "Hello! I can help you discover approved properties by buy/rent intent, budget, area, and location. Enter your query or pick a starter prompt below.",
+    "suggestionsTitle": "Quick prompts:",
+    "suggestion1": "Apartments for sale under 8B",
+    "suggestion2": "Houses for rent in Hanoi",
+    "suggestion3": "Properties over 70 sqm",
+    "suggestion4": "Villas for sale in Ho Chi Minh",
+    "inputPlaceholder": "e.g., Apartment for sale under 8B in Hanoi...",
+    "sendLabel": "Send",
+    "loadingText": "Searching approved listings...",
+    "errorMessage": "Unable to reach the AI assistant right now. Please try again.",
+    "retryLabel": "Retry",
+    "viewDetailLabel": "View details",
+    "emptyRecommendations": "No matching approved listings found. Try broadening your budget or location.",
+    "charLimitNotice": "Max 500 characters"
   }
 }

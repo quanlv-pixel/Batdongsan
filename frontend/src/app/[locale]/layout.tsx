@@ -5,6 +5,7 @@ import { notFound } from 'next/navigation';
 import { setRequestLocale } from 'next-intl/server';
 import '../globals.css';
 import { AuthProvider } from '@/context/AuthContext';
+import { AiAssistantWidget } from '@/components/assistant/AiAssistantWidget';
 import { AppLocaleProvider } from '@/i18n';
 import { getDictionary } from '@/i18n/dictionaries';
 import { buildLocalizedPageMetadata } from '@/i18n/metadata';
@@ -57,7 +58,10 @@ export default async function LocaleRootLayout({
       </head>
       <body className="font-sans antialiased bg-[#F8FAFC] text-[#142B4A] min-h-screen flex flex-col justify-between">
         <AppLocaleProvider locale={locale} messages={messages} prefixEnabled={true}>
-          <AuthProvider>{children}</AuthProvider>
+          <AuthProvider>
+            {children}
+            <AiAssistantWidget />
+          </AuthProvider>
         </AppLocaleProvider>
       </body>
     </html>
