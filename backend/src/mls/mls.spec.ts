@@ -6,6 +6,7 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { MlsService } from './mls.service.js';
+import { MlsController } from './mls.controller.js';
 import { PrismaService } from '../prisma/prisma.service.js';
 import {
   ListingStatus,
@@ -1077,6 +1078,34 @@ describe('MlsService Unit Tests (Phase 2D-1)', () => {
           role: Role.BUYER,
         }),
       ).rejects.toThrow(ForbiddenException);
+    });
+  });
+
+  // ─────────────────────────────────────────────────────────────
+  // 6. GET /api/mls/admin/shares (Admin MLS Oversight)
+  // ─────────────────────────────────────────────────────────────
+  describe('GET /api/mls/admin/shares (Admin MLS Oversight)', () => {
+    it('returns all MLS shares across all listings with formatted price and actors', async () => {
+      await mlsService.grantShare(
+        { id: 'usr_owner', role: Role.OWNER },
+        { listingId: 'lst_approved', recipientId: 'usr_agent_1' },
+      );
+
+      const res = await mlsService.getAdminMlsShares({});
+      expect(res.data).toBeDefined();
+      expect(res.meta.total).toBeGreaterThanOrEqual(1);
+      const share = res.data[0];
+      expect(share.listing).toBeDefined();
+      expect(typeof share.listing.priceVnd).toBe('string');
+      expect(share.grantedBy).toBeDefined();
+      expect(share.receivedBy).toBeDefined();
+    });
+
+    it('controller getAdminMlsShares delegates to service', async () => {
+      const mlsController = new MlsController(mlsService);
+      const res = await mlsController.getAdminMlsShares({});
+      expect(res).toBeDefined();
+      expect(res.meta).toBeDefined();
     });
   });
 });

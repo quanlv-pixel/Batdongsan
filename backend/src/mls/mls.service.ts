@@ -10,6 +10,7 @@ import { GrantMlsShareDto } from './dto/grant-mls-share.dto.js';
 import { RevokeMlsShareDto } from './dto/revoke-mls-share.dto.js';
 import { QueryReceivedMlsSharesDto } from './dto/query-received-mls-shares.dto.js';
 import { QueryMlsShareHistoryDto } from './dto/query-mls-share-history.dto.js';
+import { QueryAdminMlsSharesDto } from './dto/query-admin-mls-shares.dto.js';
 import {
   ListingStatus,
   MlsSharePermission,
@@ -632,5 +633,83 @@ export class MlsService {
     }
 
     return response;
+  }
+
+  /**
+   * GET /api/mls/admin/shares
+   * ADMIN only: View all MLS shares across all listings.
+   */
+  async getAdminMlsShares(query: QueryAdminMlsSharesDto) {
+    const page = Math.max(1, query.page ?? 1);
+    const limit = Math.min(100, Math.max(1, query.limit ?? 20));
+    const skip = (page - 1) * limit;
+
+    const where: any = {};
+    if (typeof query.isActive === 'boolean') {
+      where.isActive = query.isActive;
+    }
+
+    const [total, items] = await Promise.all([
+      this.prisma.mlsShare.count({ where }),
+      this.prisma.mlsShare.findMany({
+        where,
+        skip,
+        take: limit,
+        orderBy: { createdAt: 'desc' },
+        select: {
+          id: true,
+          listingId: true,
+          permission: true,
+          isActive: true,
+          revokedAt: true,
+          expiresAt: true,
+          createdAt: true,
+          listing: {
+            select: {
+              id: true,
+              title: true,
+              propertyType: true,
+              transactionType: true,
+              priceVnd: true,
+              status: true,
+              province: true,
+              district: true,
+            },
+          },
+          grantedBy: {
+            select: {
+              id: true,
+              fullName: true,
+              email: true,
+              phone: true,
+            },
+          },
+          receivedBy: {
+            select: {
+              id: true,
+              fullName: true,
+              email: true,
+              phone: true,
+            },
+          },
+        },
+      }),
+    ]);
+
+    return {
+      data: items.map((share) => ({
+        ...share,
+        listing: {
+          ...share.listing,
+          priceVnd: share.listing.priceVnd.toString(),
+        },
+      })),
+      meta: {
+        total,
+        page,
+        limit,
+        totalPages: Math.ceil(total / limit),
+      },
+    };
   }
 }

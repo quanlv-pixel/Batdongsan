@@ -115,6 +115,7 @@ describe('ListingsModule Unit & HTTP Flow Tests (Phase 2C)', () => {
             if (where.ownerId && item.ownerId !== where.ownerId) return false;
             if (where.propertyType && item.propertyType !== where.propertyType) return false;
             if (where.transactionType && item.transactionType !== where.transactionType) return false;
+            if (where.title?.contains && !item.title.toLowerCase().includes(where.title.contains.toLowerCase())) return false;
             if (where.province?.contains && !item.province.toLowerCase().includes(where.province.contains.toLowerCase())) return false;
             if (where.district?.contains && !item.district.toLowerCase().includes(where.district.contains.toLowerCase())) return false;
             if (where.ward?.contains && (!item.ward || !item.ward.toLowerCase().includes(where.ward.contains.toLowerCase()))) return false;
@@ -135,6 +136,7 @@ describe('ListingsModule Unit & HTTP Flow Tests (Phase 2C)', () => {
               if (v === true) res[k] = item[k];
               else if (typeof v === 'object' && k === 'images') res[k] = item.images ?? [];
               else if (typeof v === 'object' && k === 'moderationLogs') res[k] = moderationLogsStore.filter((m) => m.listingId === item.id);
+              else if (typeof v === 'object' && k === 'owner') res[k] = usersStore.get(item.ownerId) ?? { id: item.ownerId, fullName: 'Owner Test', email: 'owner@test.com' };
             }
             return res;
           });
@@ -149,6 +151,7 @@ describe('ListingsModule Unit & HTTP Flow Tests (Phase 2C)', () => {
             if (where.ownerId && item.ownerId !== where.ownerId) return false;
             if (where.propertyType && item.propertyType !== where.propertyType) return false;
             if (where.transactionType && item.transactionType !== where.transactionType) return false;
+            if (where.title?.contains && !item.title.toLowerCase().includes(where.title.contains.toLowerCase())) return false;
             return true;
           });
         }
@@ -993,6 +996,47 @@ describe('ListingsModule Unit & HTTP Flow Tests (Phase 2C)', () => {
       } as unknown as ExecutionContext;
 
       await expect(jwtAuthGuard.canActivate(context)).rejects.toThrow();
+    });
+  });
+
+  // ─────────────────────────────────────────────────────────────
+  // 8. GET /api/listings/admin (Admin Listings Oversight)
+  // ─────────────────────────────────────────────────────────────
+  describe('GET /api/listings/admin (Admin Listings Oversight)', () => {
+    beforeEach(async () => {
+      await listingsService.createListing('usr_owner_01', {
+        title: 'Căn hộ Admin kiểm duyệt',
+        description: 'Mô tả',
+        propertyType: PropertyType.APARTMENT,
+        transactionType: TransactionType.FOR_SALE,
+        priceVnd: '3500000000',
+        areaSqm: 75,
+        province: 'Hà Nội',
+        district: 'Cầu Giấy',
+      });
+    });
+
+    it('should return all listings across all statuses with owner info', async () => {
+      const res = await listingsService.getAdminListings({});
+      expect(res.data).toBeDefined();
+      expect(res.meta.total).toBeGreaterThanOrEqual(1);
+      for (const item of res.data) {
+        expect(typeof item.priceVnd).toBe('string');
+        expect(item.owner).toBeDefined();
+      }
+    });
+
+    it('should filter admin listings by status', async () => {
+      const res = await listingsService.getAdminListings({ status: ListingStatus.DRAFT });
+      for (const item of res.data) {
+        expect(item.status).toBe(ListingStatus.DRAFT);
+      }
+    });
+
+    it('controller getAdminListings delegates to service', async () => {
+      const res = await listingsController.getAdminListings({});
+      expect(res).toBeDefined();
+      expect(res.meta).toBeDefined();
     });
   });
 });

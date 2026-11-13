@@ -101,6 +101,27 @@ export function Navbar() {
               <span>{dict.Navbar.workspace || 'Quản lý'}</span>
             </Link>
           )}
+          {isAuthenticated && user && user.role === 'ADMIN' && (
+            <Link
+              href={localizeHref('/admin')}
+              onClick={() => setIsMenuOpen(false)}
+              className="py-2 text-sm font-semibold text-purple-700 hover:text-purple-800 transition-colors flex items-center gap-1.5"
+              data-testid="mobile-navbar-admin-link"
+            >
+              <span className="material-symbols-outlined text-base">admin_panel_settings</span>
+              <span>{dict.Navbar.admin || 'Quản trị'}</span>
+            </Link>
+          )}
+          {isAuthenticated && user && user.role === 'ADMIN' && (
+            <Link
+              href={localizeHref('/admin')}
+              className="text-sm font-semibold text-purple-700 hover:text-purple-800 transition-colors flex items-center gap-1"
+              data-testid="navbar-admin-link"
+            >
+              <span className="material-symbols-outlined text-base">admin_panel_settings</span>
+              <span>{dict.Navbar.admin || 'Quản trị'}</span>
+            </Link>
+          )}
         </nav>
 
         {/* Right: Language Switcher & Auth State Actions */}
@@ -199,6 +220,17 @@ export function Navbar() {
             >
               <span className="material-symbols-outlined text-base">dashboard</span>
               <span>{dict.Navbar.workspace || 'Quản lý'}</span>
+            </Link>
+          )}
+          {isAuthenticated && user && user.role === 'ADMIN' && (
+            <Link
+              href={localizeHref('/admin')}
+              onClick={() => setIsMenuOpen(false)}
+              className="py-2 text-sm font-semibold text-purple-700 hover:text-purple-800 transition-colors flex items-center gap-1.5"
+              data-testid="mobile-navbar-admin-link"
+            >
+              <span className="material-symbols-outlined text-base">admin_panel_settings</span>
+              <span>{dict.Navbar.admin || 'Quản trị'}</span>
             </Link>
           )}
           {isAuthenticated && user ? (

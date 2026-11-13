@@ -15,6 +15,7 @@ import { CreateListingDto } from './dto/create-listing.dto.js';
 import { UpdateListingDto } from './dto/update-listing.dto.js';
 import { QueryListingsDto } from './dto/query-listings.dto.js';
 import { QueryMyListingsDto } from './dto/query-my-listings.dto.js';
+import { QueryAdminListingsDto } from './dto/query-admin-listings.dto.js';
 import { ModerateListingDto } from './dto/moderate-listing.dto.js';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard.js';
 import { RolesGuard } from '../auth/guards/roles.guard.js';
@@ -53,6 +54,18 @@ export class ListingsController {
     @Query() query: QueryMyListingsDto,
   ) {
     return this.listingsService.getMyListings(userId, query);
+  }
+
+  /**
+   * GET /api/listings/admin
+   * ADMIN only; view all listings across all statuses for moderation queue & oversight.
+   * NOTE: Registered strictly BEFORE /:id to prevent route shadowing.
+   */
+  @Get('admin')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(Role.ADMIN)
+  async getAdminListings(@Query() query: QueryAdminListingsDto) {
+    return this.listingsService.getAdminListings(query);
   }
 
   /**

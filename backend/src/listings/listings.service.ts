@@ -10,6 +10,7 @@ import { CreateListingDto } from './dto/create-listing.dto.js';
 import { UpdateListingDto } from './dto/update-listing.dto.js';
 import { QueryListingsDto } from './dto/query-listings.dto.js';
 import { QueryMyListingsDto } from './dto/query-my-listings.dto.js';
+import { QueryAdminListingsDto } from './dto/query-admin-listings.dto.js';
 import { ModerateListingDto } from './dto/moderate-listing.dto.js';
 import {
   ListingStatus,
@@ -562,5 +563,95 @@ export class ListingsService {
         },
       },
     });
+  }
+
+  /**
+   * GET /api/listings/admin
+   * ADMIN only: View listings across all statuses for moderation queue & oversight.
+   */
+  async getAdminListings(query: QueryAdminListingsDto) {
+    const page = Math.max(1, query.page ?? 1);
+    const limit = Math.min(100, Math.max(1, query.limit ?? 20));
+    const skip = (page - 1) * limit;
+
+    const where: any = {};
+
+    if (query.status && query.status !== 'ALL') {
+      where.status = query.status as ListingStatus;
+    }
+
+    if (query.search?.trim()) {
+      where.title = {
+        contains: query.search.trim(),
+        mode: 'insensitive',
+      };
+    }
+
+    const [total, items] = await Promise.all([
+      this.prisma.listing.count({ where }),
+      this.prisma.listing.findMany({
+        where,
+        skip,
+        take: limit,
+        orderBy: { createdAt: 'desc' },
+        select: {
+          id: true,
+          title: true,
+          description: true,
+          propertyType: true,
+          transactionType: true,
+          priceVnd: true,
+          rentalPeriod: true,
+          areaSqm: true,
+          province: true,
+          district: true,
+          ward: true,
+          streetAddress: true,
+          status: true,
+          createdAt: true,
+          updatedAt: true,
+          owner: {
+            select: {
+              id: true,
+              fullName: true,
+              email: true,
+              phone: true,
+            },
+          },
+          images: {
+            select: { id: true, url: true, order: true },
+            orderBy: { order: 'asc' },
+          },
+          moderationLogs: {
+            select: {
+              id: true,
+              fromStatus: true,
+              toStatus: true,
+              reason: true,
+              createdAt: true,
+              moderator: {
+                select: {
+                  id: true,
+                  fullName: true,
+                  email: true,
+                },
+              },
+            },
+            orderBy: { createdAt: 'desc' },
+            take: 3,
+          },
+        },
+      }),
+    ]);
+
+    return {
+      data: items.map((item) => this.formatListing(item)),
+      meta: {
+        total,
+        page,
+        limit,
+        totalPages: Math.ceil(total / limit),
+      },
+    };
   }
 }

@@ -15,6 +15,16 @@ import {
   ReceivedMlsSharesResponse,
   GrantMlsShareInput,
   ReceivedMlsShareItem,
+  AdminListingsResponse,
+  AdminListingItem,
+  ModerationLogItem,
+  AdminContactRequestsResponse,
+  RequestAssignmentHistoryItem,
+  AdminUsersResponse,
+  AdminUserItem,
+  AdminAgentOption,
+  AdminMlsSharesResponse,
+  Role,
 } from '@/types';
 
 export class ApiClientError extends Error {
@@ -296,6 +306,195 @@ class ApiClient {
   ): Promise<{ id: string; isActive: boolean; message?: string }> {
     return this.request<{ id: string; isActive: boolean; message?: string }>(
       `/api/mls/shares/${encodeURIComponent(shareId)}/revoke`,
+      {
+        method: 'POST',
+        body: JSON.stringify({ reason }),
+      },
+    );
+  }
+
+  // ── Admin: Moderation, Requests, Users & MLS Oversight ────────
+
+  public async getAdminListings(params?: {
+    page?: number;
+    limit?: number;
+    status?: string;
+    search?: string;
+  }): Promise<AdminListingsResponse> {
+    const query = new URLSearchParams();
+    if (params?.page) query.set('page', String(params.page));
+    if (params?.limit) query.set('limit', String(params.limit));
+    if (params?.status) query.set('status', params.status);
+    if (params?.search) query.set('search', params.search);
+    const qs = query.toString();
+    return this.request<AdminListingsResponse>(
+      `/api/admin/listings${qs ? `?${qs}` : ''}`,
+      { method: 'GET' },
+    );
+  }
+
+  public async moderateListing(
+    id: string,
+    data: { status: 'APPROVED' | 'REJECTED'; reason?: string },
+  ): Promise<AdminListingItem> {
+    return this.request<AdminListingItem>(
+      `/api/admin/listings/${encodeURIComponent(id)}/moderate`,
+      {
+        method: 'POST',
+        body: JSON.stringify(data),
+      },
+    );
+  }
+
+  public async getModerationHistory(id: string): Promise<ModerationLogItem[]> {
+    return this.request<ModerationLogItem[]>(
+      `/api/admin/listings/${encodeURIComponent(id)}/history`,
+      { method: 'GET' },
+    );
+  }
+
+  public async getAdminContactRequests(params?: {
+    page?: number;
+    limit?: number;
+    status?: string;
+    unassigned?: boolean;
+    agentId?: string;
+  }): Promise<AdminContactRequestsResponse> {
+    const query = new URLSearchParams();
+    if (params?.page) query.set('page', String(params.page));
+    if (params?.limit) query.set('limit', String(params.limit));
+    if (params?.status) query.set('status', params.status);
+    if (params?.unassigned !== undefined) query.set('unassigned', String(params.unassigned));
+    if (params?.agentId) query.set('agentId', params.agentId);
+    const qs = query.toString();
+    return this.request<AdminContactRequestsResponse>(
+      `/api/admin/requests${qs ? `?${qs}` : ''}`,
+      { method: 'GET' },
+    );
+  }
+
+  public async assignContactRequest(
+    id: string,
+    data: { agentId: string; note?: string },
+  ): Promise<Record<string, unknown>> {
+    return this.request<Record<string, unknown>>(
+      `/api/admin/requests/${encodeURIComponent(id)}/assign`,
+      {
+        method: 'POST',
+        body: JSON.stringify(data),
+      },
+    );
+  }
+
+  public async reassignContactRequest(
+    id: string,
+    data: { newAgentId: string; reason: string },
+  ): Promise<Record<string, unknown>> {
+    return this.request<Record<string, unknown>>(
+      `/api/admin/requests/${encodeURIComponent(id)}/reassign`,
+      {
+        method: 'POST',
+        body: JSON.stringify(data),
+      },
+    );
+  }
+
+  public async reopenContactRequest(
+    id: string,
+    data: { reason: string },
+  ): Promise<Record<string, unknown>> {
+    return this.request<Record<string, unknown>>(
+      `/api/admin/requests/${encodeURIComponent(id)}/reopen`,
+      {
+        method: 'POST',
+        body: JSON.stringify(data),
+      },
+    );
+  }
+
+  public async getContactRequestAssignments(
+    id: string,
+  ): Promise<RequestAssignmentHistoryItem[]> {
+    return this.request<RequestAssignmentHistoryItem[]>(
+      `/api/admin/requests/${encodeURIComponent(id)}/assignments`,
+      { method: 'GET' },
+    );
+  }
+
+  public async getAdminUsers(params?: {
+    page?: number;
+    limit?: number;
+    role?: string;
+    isActive?: boolean;
+    search?: string;
+  }): Promise<AdminUsersResponse> {
+    const query = new URLSearchParams();
+    if (params?.page) query.set('page', String(params.page));
+    if (params?.limit) query.set('limit', String(params.limit));
+    if (params?.role) query.set('role', params.role);
+    if (params?.isActive !== undefined) query.set('isActive', String(params.isActive));
+    if (params?.search) query.set('search', params.search);
+    const qs = query.toString();
+    return this.request<AdminUsersResponse>(
+      `/api/admin/users${qs ? `?${qs}` : ''}`,
+      { method: 'GET' },
+    );
+  }
+
+  public async getAdminAgents(): Promise<AdminAgentOption[]> {
+    return this.request<AdminAgentOption[]>('/api/admin/agents', {
+      method: 'GET',
+    });
+  }
+
+  public async updateUserRole(
+    id: string,
+    data: { role: Role },
+  ): Promise<AdminUserItem> {
+    return this.request<AdminUserItem>(
+      `/api/admin/users/${encodeURIComponent(id)}/role`,
+      {
+        method: 'PATCH',
+        body: JSON.stringify(data),
+      },
+    );
+  }
+
+  public async updateUserStatus(
+    id: string,
+    data: { isActive: boolean },
+  ): Promise<AdminUserItem> {
+    return this.request<AdminUserItem>(
+      `/api/admin/users/${encodeURIComponent(id)}/status`,
+      {
+        method: 'PATCH',
+        body: JSON.stringify(data),
+      },
+    );
+  }
+
+  public async getAdminMlsShares(params?: {
+    page?: number;
+    limit?: number;
+    isActive?: boolean;
+  }): Promise<AdminMlsSharesResponse> {
+    const query = new URLSearchParams();
+    if (params?.page) query.set('page', String(params.page));
+    if (params?.limit) query.set('limit', String(params.limit));
+    if (params?.isActive !== undefined) query.set('isActive', String(params.isActive));
+    const qs = query.toString();
+    return this.request<AdminMlsSharesResponse>(
+      `/api/admin/mls${qs ? `?${qs}` : ''}`,
+      { method: 'GET' },
+    );
+  }
+
+  public async revokeMlsShareAsAdmin(
+    id: string,
+    reason?: string,
+  ): Promise<{ id: string; isActive: boolean }> {
+    return this.request<{ id: string; isActive: boolean }>(
+      `/api/admin/mls/${encodeURIComponent(id)}/revoke`,
       {
         method: 'POST',
         body: JSON.stringify({ reason }),

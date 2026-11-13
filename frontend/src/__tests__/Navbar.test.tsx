@@ -210,4 +210,29 @@ describe('Navbar Component Tests', () => {
     expect(screen.queryByText('Dự án')).toBeNull();
     expect(screen.queryByText('Tin tức')).toBeNull();
   });
+
+  it('9. ADMIN state: renders admin portal link with valid href', () => {
+    const mockUser: User = {
+      id: 'usr_admin',
+      email: 'admin@test.com',
+      fullName: 'System Administrator',
+      role: 'ADMIN',
+    };
+
+    vi.spyOn(AuthContextModule, 'useAuth').mockReturnValue({
+      user: mockUser,
+      isAuthenticated: true,
+      isLoading: false,
+      login: vi.fn(),
+      register: vi.fn(),
+      logout: vi.fn(),
+      refreshUser: vi.fn(),
+    });
+
+    render(<Navbar />);
+
+    const adminLink = screen.getByTestId('navbar-admin-link');
+    expect(adminLink).toBeDefined();
+    expect(adminLink.getAttribute('href')).toBe('/admin');
+  });
 });
