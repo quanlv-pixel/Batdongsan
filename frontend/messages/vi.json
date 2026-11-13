@@ -797,5 +797,28 @@
       "expiresAt": "Hạn sử dụng",
       "unlimited": "Không thời hạn"
     }
+  },
+  "AiAssistant": {
+    "launcherLabel": "Trợ lý AI BĐS",
+    "launcherAriaLabel": "Mở Trợ lý AI Bất động sản",
+    "title": "Trợ lý AI BĐS",
+    "subtitle": "Gợi ý từ tin đăng đã kiểm duyệt",
+    "closeLabel": "Đóng trợ lý",
+    "clearLabel": "Xóa hội thoại",
+    "disclaimer": "Gợi ý dựa trên tin đăng đã kiểm duyệt trên Batdongsan; thông tin chỉ mang tính tham khảo.",
+    "welcomeMessage": "Xin chào! Tôi có thể giúp bạn tìm bất động sản phù hợp theo nhu cầu mua/thuê, mức giá, diện tích và khu vực. Hãy nhập yêu cầu hoặc chọn gợi ý bên dưới.",
+    "suggestionsTitle": "Gợi ý tìm nhanh:",
+    "suggestion1": "Căn hộ bán dưới 8 tỷ",
+    "suggestion2": "Nhà cho thuê tại Hà Nội",
+    "suggestion3": "Bất động sản diện tích từ 70m²",
+    "suggestion4": "Biệt thự bán tại Hồ Chí Minh",
+    "inputPlaceholder": "Ví dụ: Tìm căn hộ bán dưới 8 tỷ tại Hà Nội...",
+    "sendLabel": "Gửi",
+    "loadingText": "Đang tìm kiếm tin đăng phù hợp...",
+    "errorMessage": "Không thể kết nối trợ lý AI lúc này. Vui lòng thử lại.",
+    "retryLabel": "Thử lại",
+    "viewDetailLabel": "Xem chi tiết",
+    "emptyRecommendations": "Chưa có tin đăng phù hợp. Bạn thử mở rộng mức giá hoặc khu vực nhé.",
+    "charLimitNotice": "Tối đa 500 ký tự"
   }
 }
