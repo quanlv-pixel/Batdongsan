@@ -62,6 +62,8 @@ export function useAppLocale(): AppLocale {
   return ctx ? ctx.locale : DEFAULT_LOCALE;
 }
 
+export { useAppLocale as useLocale };
+
 export function useDictionary(): AppMessages {
   const ctx = useContext(LocaleContext);
   return ctx ? ctx.messages : getDictionary(DEFAULT_LOCALE);

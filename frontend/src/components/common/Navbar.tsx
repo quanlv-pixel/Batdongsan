@@ -91,6 +91,16 @@ export function Navbar() {
           >
             {dict.Navbar.forRent}
           </Link>
+          {isAuthenticated && user && user.role !== 'BUYER' && (
+            <Link
+              href={localizeHref('/quan-ly')}
+              className="text-sm font-semibold text-[#0F766E] hover:text-[#0D655E] transition-colors flex items-center gap-1"
+              data-testid="navbar-workspace-link"
+            >
+              <span className="material-symbols-outlined text-base">dashboard</span>
+              <span>{dict.Navbar.workspace || 'Quản lý'}</span>
+            </Link>
+          )}
         </nav>
 
         {/* Right: Language Switcher & Auth State Actions */}
@@ -180,6 +190,17 @@ export function Navbar() {
           >
             {dict.Navbar.forRent}
           </Link>
+          {isAuthenticated && user && user.role !== 'BUYER' && (
+            <Link
+              href={localizeHref('/quan-ly')}
+              onClick={() => setIsMenuOpen(false)}
+              className="block text-sm font-semibold text-[#0F766E] hover:text-[#0D655E] py-2 flex items-center gap-1"
+              data-testid="mobile-navbar-workspace-link"
+            >
+              <span className="material-symbols-outlined text-base">dashboard</span>
+              <span>{dict.Navbar.workspace || 'Quản lý'}</span>
+            </Link>
+          )}
           {isAuthenticated && user ? (
             <div className="pt-2 border-t border-[#E2E8F0] space-y-2">
               <div className="flex items-center gap-2 py-1">
