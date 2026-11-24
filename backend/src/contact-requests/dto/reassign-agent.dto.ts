@@ -1,10 +1,16 @@
-import { IsNotEmpty, IsOptional, IsString, MaxLength } from 'class-validator';
+import { IsNotEmpty, IsOptional, IsString, MaxLength, ValidateIf } from 'class-validator';
 import { Transform } from 'class-transformer';
 
 export class ReassignAgentDto {
+  @ValidateIf((o: ReassignAgentDto) => !o.newAgentId)
   @IsString()
   @IsNotEmpty({ message: 'agentId must not be empty' })
-  agentId!: string;
+  agentId?: string;
+
+  @ValidateIf((o: ReassignAgentDto) => !o.agentId)
+  @IsString()
+  @IsNotEmpty({ message: 'newAgentId must not be empty' })
+  newAgentId?: string;
 
   @IsOptional()
   @IsString()

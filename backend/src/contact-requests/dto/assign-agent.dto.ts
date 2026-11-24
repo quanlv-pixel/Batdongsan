@@ -11,4 +11,10 @@ export class AssignAgentDto {
   @MaxLength(500, { message: 'reason must not exceed 500 characters' })
   @Transform(({ value }) => (typeof value === 'string' ? value.trim() : value))
   reason?: string;
+
+  @IsOptional()
+  @IsString()
+  @MaxLength(500, { message: 'note must not exceed 500 characters' })
+  @Transform(({ value }) => (typeof value === 'string' ? value.trim() : value))
+  note?: string;
 }

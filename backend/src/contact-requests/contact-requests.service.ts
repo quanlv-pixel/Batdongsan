@@ -625,6 +625,23 @@ export class ContactRequestsService {
                 assignedAt: activeAssign.assignedAt,
               }
             : null,
+          assignments: activeAssign
+            ? [
+                {
+                  id: activeAssign.id,
+                  agentId: activeAssign.agent.id,
+                  isActive: activeAssign.isActive,
+                  assignedAt: activeAssign.assignedAt,
+                  releasedAt: null,
+                  agent: {
+                    id: activeAssign.agent.id,
+                    fullName: activeAssign.agent.fullName,
+                    email: activeAssign.agent.email,
+                    phone: activeAssign.agent.phone,
+                  },
+                },
+              ]
+            : [],
         };
       }),
       meta: {
@@ -1046,7 +1063,7 @@ export class ContactRequestsService {
             meta: {
               contactRequestId: id,
               agentId: dto.agentId,
-              reason: dto.reason ?? null,
+              reason: dto.reason || dto.note || null,
             },
           },
         });
@@ -1077,6 +1094,11 @@ export class ContactRequestsService {
     caller: { id: string; role: Role },
     dto: ReassignAgentDto,
   ) {
+    const targetAgentId = dto.agentId ?? dto.newAgentId;
+    if (!targetAgentId) {
+      throw new BadRequestException('agentId must not be empty');
+    }
+
     try {
       return await this.prisma.$transaction(async (tx) => {
         const request = await tx.contactRequest.findUnique({
@@ -1102,12 +1124,12 @@ export class ContactRequestsService {
           throw new ConflictException('No active assignment exists for this request. Use assign instead.');
         }
 
-        if (activeAssignment.agentId === dto.agentId) {
+        if (activeAssignment.agentId === targetAgentId) {
           throw new BadRequestException('Request is already actively assigned to this agent');
         }
 
         const targetUser = await tx.user.findUnique({
-          where: { id: dto.agentId },
+          where: { id: targetAgentId },
           select: { id: true, role: true, isActive: true },
         });
 
@@ -1131,7 +1153,7 @@ export class ContactRequestsService {
         const newAssignment = await tx.requestAssignment.create({
           data: {
             contactRequestId: id,
-            agentId: dto.agentId,
+            agentId: targetAgentId,
             isActive: true,
             assignedAt: now,
           },
@@ -1162,7 +1184,7 @@ export class ContactRequestsService {
             meta: {
               contactRequestId: id,
               previousAgentId: activeAssignment.agentId,
-              newAgentId: dto.agentId,
+              newAgentId: targetAgentId,
               reason: dto.reason ?? null,
             },
           },
