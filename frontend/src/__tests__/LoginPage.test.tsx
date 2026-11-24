@@ -269,4 +269,58 @@ describe('LoginPage Component Tests', () => {
 
     expect(mockPush).toHaveBeenCalledWith('/');
   });
+
+  it('9. Multiple accounts on same email displays account picker and logs into selected account', async () => {
+    const mockLogin = vi
+      .fn()
+      .mockResolvedValueOnce({
+        requiresAccountSelection: true,
+        accounts: [
+          { id: 'usr_buyer', email: 'shared@gmail.com', fullName: 'Tài Khoản Mua', role: 'BUYER' },
+          { id: 'usr_agent', email: 'shared@gmail.com', fullName: 'Tài Khoản Môi Giới', role: 'AGENT' },
+        ],
+      })
+      .mockResolvedValueOnce({
+        user: { id: 'usr_agent', email: 'shared@gmail.com', fullName: 'Tài Khoản Môi Giới', role: 'AGENT' },
+      });
+
+    vi.spyOn(AuthContextModule, 'useAuth').mockReturnValue({
+      user: null,
+      isAuthenticated: false,
+      isLoading: false,
+      login: mockLogin,
+      register: vi.fn(),
+      logout: vi.fn(),
+      refreshUser: vi.fn(),
+    });
+
+    render(<LoginPage />);
+
+    fireEvent.change(screen.getByPlaceholderText('Nhập địa chỉ email của bạn'), {
+      target: { value: 'shared@gmail.com' },
+    });
+    fireEvent.change(screen.getByPlaceholderText('Nhập mật khẩu'), {
+      target: { value: 'password123' },
+    });
+
+    await act(async () => {
+      fireEvent.click(screen.getByRole('button', { name: /Đăng nhập/i }));
+    });
+
+    expect(screen.getByText('Chọn tài khoản đăng nhập')).toBeDefined();
+    expect(screen.getByText('Tài Khoản Môi Giới')).toBeDefined();
+    expect(mockPush).not.toHaveBeenCalled();
+
+    await act(async () => {
+      fireEvent.click(screen.getByText('Tài Khoản Môi Giới'));
+    });
+
+    expect(mockLogin).toHaveBeenLastCalledWith({
+      email: 'shared@gmail.com',
+      password: 'password123',
+      rememberMe: false,
+      userId: 'usr_agent',
+    });
+    expect(mockPush).toHaveBeenCalledWith('/');
+  });
 });

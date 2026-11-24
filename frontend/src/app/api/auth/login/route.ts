@@ -5,22 +5,41 @@ import { getBackendBaseUrl } from '@/lib/server-config';
 export async function POST(request: Request) {
   try {
     const body = await request.json();
-    const { email, password, rememberMe } = body ?? {};
+    const { email, password, rememberMe, userId } = body ?? {};
     const backendUrl = getBackendBaseUrl();
 
-    // Whitelist only email and password for NestJS LoginDto
+    // Whitelist only email, password, and optional userId for NestJS LoginDto
+    const loginPayload: { email: string; password: string; userId?: string } = {
+      email,
+      password,
+    };
+    if (typeof userId === 'string' && userId.trim().length > 0) {
+      loginPayload.userId = userId;
+    }
+
     const response = await fetch(`${backendUrl}/api/auth/login`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify({ email, password }),
+      body: JSON.stringify(loginPayload),
     });
 
     const data = await response.json();
 
     if (!response.ok) {
       return NextResponse.json(data, { status: response.status });
+    }
+
+    // Multiple accounts match the same email and password — ask user to select one
+    if (data?.requiresAccountSelection === true && Array.isArray(data?.accounts)) {
+      return NextResponse.json(
+        {
+          requiresAccountSelection: true,
+          accounts: data.accounts,
+        },
+        { status: 200 },
+      );
     }
 
     const { accessToken, user } = data;

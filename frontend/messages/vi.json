@@ -243,6 +243,11 @@
       "roadmapTitle": "Tính năng đang trong lộ trình phát triển",
       "roadmapDescription": "Chức năng gửi email đặt lại mật khẩu (GAP-03) hiện chưa được hỗ trợ tại API backend. Vui lòng sử dụng tài khoản mẫu hoặc liên hệ quản trị viên để được hỗ trợ.",
       "acknowledgeButton": "Đã hiểu"
+    },
+    "accountSelection": {
+      "title": "Chọn tài khoản đăng nhập",
+      "subtitle": "Email này đang được liên kết với nhiều tài khoản. Vui lòng chọn tài khoản bạn muốn truy cập:",
+      "backButton": "Quay lại"
     }
   },
   "RegisterPage": {

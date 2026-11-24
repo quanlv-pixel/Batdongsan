@@ -50,10 +50,21 @@ export interface LoginRequest {
   email: string;
   password: string;
   rememberMe?: boolean;
+  userId?: string;
+}
+
+export interface LoginAccountOption {
+  id: string;
+  email: string;
+  fullName: string;
+  role: Role;
+  createdAt?: string;
 }
 
 export interface LoginResponse {
-  user: User;
+  user?: User;
+  requiresAccountSelection?: boolean;
+  accounts?: LoginAccountOption[];
 }
 
 export interface RegisterRequest {

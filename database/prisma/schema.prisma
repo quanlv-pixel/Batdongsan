@@ -81,14 +81,14 @@ enum MlsSharePermission {
 
 model User {
   id                 String             @id @default(cuid())
-  email              String             @unique
+  email              String
   passwordHash       String
   fullName           String
   phone              String?
   avatarUrl          String?
-  /// User's self-declared intent at registration (does NOT confer elevated privileges)
+  /// User's self-declared intent at registration
   registrationIntent RegistrationIntent @default(BUYER)
-  /// Backend-assigned role — never set directly from registration form (BR-02)
+  /// Account role
   role               Role               @default(BUYER)
   isActive           Boolean            @default(true)
   createdAt          DateTime           @default(now())
@@ -103,6 +103,7 @@ model User {
   assignedRequests  RequestAssignment[] @relation("AssignedAgent")
   auditLogs         AuditLog[]
 
+  @@index([email])
   @@map("users")
 }
 

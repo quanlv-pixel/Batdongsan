@@ -110,8 +110,9 @@ async function main() {
   console.log(`- Upserting ${seedUsers.length} synthetic user accounts...`);
   for (const user of seedUsers) {
     await prisma.user.upsert({
-      where: { email: user.email },
+      where: { id: user.id },
       update: {
+        email: user.email,
         fullName: user.fullName,
         phone: user.phone,
         avatarUrl: user.avatarUrl,
@@ -124,11 +125,11 @@ async function main() {
   }
 
   // Retrieve user references
-  const adminUser = await prisma.user.findUniqueOrThrow({ where: { email: "admin@example.test" } });
-  const ownerUser = await prisma.user.findUniqueOrThrow({ where: { email: "owner@example.test" } });
-  const buyerUser = await prisma.user.findUniqueOrThrow({ where: { email: "buyer@example.test" } });
-  const agentAUser = await prisma.user.findUniqueOrThrow({ where: { email: "agent_a@example.test" } });
-  const agentBUser = await prisma.user.findUniqueOrThrow({ where: { email: "agent_b@example.test" } });
+  const adminUser = await prisma.user.findUniqueOrThrow({ where: { id: "seed_user_admin_01" } });
+  const ownerUser = await prisma.user.findUniqueOrThrow({ where: { id: "seed_user_owner_01" } });
+  const buyerUser = await prisma.user.findUniqueOrThrow({ where: { id: "seed_user_buyer_01" } });
+  const agentAUser = await prisma.user.findUniqueOrThrow({ where: { id: "seed_user_agent_a" } });
+  const agentBUser = await prisma.user.findUniqueOrThrow({ where: { id: "seed_user_agent_b" } });
 
   // ─────────────────────────────────────────────────────────────
   // 2. Seed 10 Realistic Synthetic Listings

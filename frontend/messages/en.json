@@ -243,6 +243,11 @@
       "roadmapTitle": "Feature Under Development",
       "roadmapDescription": "Password reset email delivery (GAP-03) is not yet supported by the backend API. Please use a demo account or contact an administrator for assistance.",
       "acknowledgeButton": "Got it"
+    },
+    "accountSelection": {
+      "title": "Select Account to Sign In",
+      "subtitle": "This email is linked to multiple accounts. Please choose the account you want to access:",
+      "backButton": "Back"
     }
   },
   "RegisterPage": {

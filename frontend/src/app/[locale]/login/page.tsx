@@ -9,6 +9,7 @@ import { ApiClientError } from '@/lib/api-client';
 import { useDictionary, useLocalizedHref } from '@/i18n';
 import { LanguageSwitcher } from '@/components/common/LanguageSwitcher';
 import { sanitizeReturnTo } from '@/lib/navigation';
+import { LoginAccountOption } from '@/types';
 
 export default function LoginPage() {
   const router = useRouter();
@@ -26,6 +27,15 @@ export default function LoginPage() {
   const [isLoading, setIsLoading] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [showForgotModal, setShowForgotModal] = useState(false);
+  const [accountOptions, setAccountOptions] = useState<LoginAccountOption[] | null>(null);
+
+  const redirectAfterLogin = () => {
+    if (safeReturnTo) {
+      router.push(safeReturnTo);
+    } else {
+      router.push(localizeHref('/'));
+    }
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -40,13 +50,43 @@ export default function LoginPage() {
     setIsLoading(true);
 
     try {
-      await login({ email: email.trim(), password, rememberMe });
-      // Redirect to home page upon successful login
-      if (safeReturnTo) {
-        router.push(safeReturnTo);
-      } else {
-        router.push(localizeHref('/'));
+      const result = await login({ email: email.trim(), password, rememberMe });
+      if (
+        result &&
+        'requiresAccountSelection' in result &&
+        result.requiresAccountSelection &&
+        Array.isArray(result.accounts)
+      ) {
+        setAccountOptions(result.accounts);
+        return;
       }
+      redirectAfterLogin();
+    } catch (err: unknown) {
+      if (err instanceof ApiClientError) {
+        if (err.statusCode === 401) {
+          setErrorMessage(dict.LoginPage.errors.invalidCredentials);
+        } else {
+          setErrorMessage(err.message || dict.LoginPage.errors.loginFailed);
+        }
+      } else {
+        const message =
+          err instanceof Error
+            ? err.message
+            : dict.LoginPage.errors.networkError;
+        setErrorMessage(message);
+      }
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleSelectAccount = async (userId: string) => {
+    setErrorMessage(null);
+    setIsLoading(true);
+
+    try {
+      await login({ email: email.trim(), password, rememberMe, userId });
+      redirectAfterLogin();
     } catch (err: unknown) {
       if (err instanceof ApiClientError) {
         if (err.statusCode === 401) {
@@ -244,7 +284,58 @@ export default function LoginPage() {
               </div>
             )}
 
-            {/* Form */}
+            {/* Account Selection or Form */}
+            {accountOptions ? (
+              <div className="space-y-4">
+                <div>
+                  <h2 className="text-lg font-bold text-[#142B4A]">
+                    {dict.LoginPage.accountSelection.title}
+                  </h2>
+                  <p className="text-xs text-[#475569] mt-1">
+                    {dict.LoginPage.accountSelection.subtitle}
+                  </p>
+                </div>
+
+                <div className="space-y-2.5">
+                  {accountOptions.map((account) => (
+                    <button
+                      key={account.id}
+                      type="button"
+                      disabled={isLoading}
+                      onClick={() => handleSelectAccount(account.id)}
+                      className="w-full text-left p-3.5 rounded-lg border border-[#E2E8F0] hover:border-[#0F766E] hover:bg-teal-50/40 transition-all flex items-center justify-between gap-3 disabled:opacity-60 disabled:cursor-not-allowed"
+                    >
+                      <div className="min-w-0">
+                        <p className="text-sm font-semibold text-[#142B4A] truncate">
+                          {account.fullName}
+                        </p>
+                        <p className="text-xs text-[#64748B] truncate">
+                          {account.email}
+                        </p>
+                      </div>
+                      <span className="shrink-0 inline-flex items-center px-2.5 py-1 rounded-full text-xs font-semibold bg-teal-50 text-[#0F766E] border border-teal-200">
+                        {dict.Navbar.roles[account.role]}
+                      </span>
+                    </button>
+                  ))}
+                </div>
+
+                <button
+                  type="button"
+                  disabled={isLoading}
+                  onClick={() => {
+                    setAccountOptions(null);
+                    setErrorMessage(null);
+                  }}
+                  className="inline-flex items-center gap-1.5 text-xs font-semibold text-[#475569] hover:text-[#0F766E] transition-colors"
+                >
+                  <span className="material-symbols-outlined text-base">
+                    arrow_back
+                  </span>
+                  <span>{dict.LoginPage.accountSelection.backButton}</span>
+                </button>
+              </div>
+            ) : (
             <form className="space-y-5" onSubmit={handleSubmit} noValidate>
               {/* Email field */}
               <div>
@@ -403,6 +494,7 @@ export default function LoginPage() {
                 </p>
               </div>
             </form>
+            )}
           </section>
         </div>
       </main>

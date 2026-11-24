@@ -198,6 +198,60 @@ describe('BFF Authentication Route Handlers Tests', () => {
       expect(data.message).toBe('Không thể kết nối đến máy chủ xác thực. Vui lòng thử lại sau.');
       expect(mockCookieSet).not.toHaveBeenCalled();
     });
+
+    it('6. Multiple matching accounts returns account selection without setting session cookie and forwards userId on retry', async () => {
+      const mockAccounts = [
+        { id: 'usr_buyer', email: 'shared@gmail.com', fullName: 'Người Mua', role: 'BUYER' },
+        { id: 'usr_agent', email: 'shared@gmail.com', fullName: 'Môi Giới', role: 'AGENT' },
+      ];
+
+      global.fetch = vi.fn().mockResolvedValueOnce({
+        ok: true,
+        status: 200,
+        headers: new Headers({ 'content-type': 'application/json' }),
+        json: async () => ({ requiresAccountSelection: true, accounts: mockAccounts }),
+      } as unknown as Response);
+
+      const req1 = new Request('http://localhost:3000/api/auth/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email: 'shared@gmail.com', password: 'password123' }),
+      });
+
+      const res1 = await loginHandler(req1);
+      const data1 = await res1.json();
+
+      expect(res1.status).toBe(200);
+      expect(data1).toEqual({ requiresAccountSelection: true, accounts: mockAccounts });
+      expect(mockCookieSet).not.toHaveBeenCalled();
+
+      const mockJwt = createMockJwt(900);
+      global.fetch = vi.fn().mockResolvedValueOnce({
+        ok: true,
+        status: 200,
+        headers: new Headers({ 'content-type': 'application/json' }),
+        json: async () => ({ accessToken: mockJwt, user: mockAccounts[1] }),
+      } as unknown as Response);
+
+      const req2 = new Request('http://localhost:3000/api/auth/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email: 'shared@gmail.com', password: 'password123', userId: 'usr_agent' }),
+      });
+
+      const res2 = await loginHandler(req2);
+      const data2 = await res2.json();
+
+      expect(res2.status).toBe(200);
+      expect(data2).toEqual({ user: mockAccounts[1] });
+      expect(global.fetch).toHaveBeenCalledWith(
+        expect.stringContaining('/api/auth/login'),
+        expect.objectContaining({
+          body: JSON.stringify({ email: 'shared@gmail.com', password: 'password123', userId: 'usr_agent' }),
+        }),
+      );
+      expect(mockCookieSet).toHaveBeenCalledTimes(1);
+    });
   });
 
   // ─────────────────────────────────────────────────────────────

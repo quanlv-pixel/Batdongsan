@@ -9,6 +9,7 @@ import React, {
 } from 'react';
 import {
   LoginRequest,
+  LoginResponse,
   RegisterRequest,
   RegisterResponse,
   User,
@@ -19,7 +20,7 @@ interface AuthContextType {
   user: User | null;
   isAuthenticated: boolean;
   isLoading: boolean;
-  login: (credentials: LoginRequest) => Promise<User>;
+  login: (credentials: LoginRequest) => Promise<LoginResponse>;
   register: (data: RegisterRequest) => Promise<RegisterResponse>;
   logout: () => Promise<void>;
   refreshUser: () => Promise<User | null>;
@@ -74,10 +75,12 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     };
   }, []);
 
-  const login = async (credentials: LoginRequest): Promise<User> => {
+  const login = async (credentials: LoginRequest): Promise<LoginResponse> => {
     const response = await apiClient.login(credentials);
-    setUser(response.user);
-    return response.user;
+    if (response.user) {
+      setUser(response.user);
+    }
+    return response;
   };
 
   const register = async (data: RegisterRequest): Promise<RegisterResponse> => {
